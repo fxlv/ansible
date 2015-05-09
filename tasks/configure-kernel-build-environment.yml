@@ -1,0 +1,38 @@
+---
+ - hosts: all
+   gather_facts: yes
+   sudo: yes
+   tasks:
+     - name: install build dependencies
+       apt: name={{item}} state=present
+       with_items:
+         - screen
+         - bc
+         - build-essential
+         - vim
+         - kernel-package
+         - libncurses5-dev 
+         - wget
+
+     - name: create directory for kernel building
+       file: path=/mnt/resource/build state=directory
+            owner=fx
+     - name: fetch kernel source
+       get_url: url=https://www.kernel.org/pub/linux/kernel/v3.x/linux-3.18.6.tar.xz 
+                dest=/mnt/resource/build
+                sha256sum=c4c1a4841173aa572d79b7530db92ce493dbefe8049e6f461a46dd897df253f5
+                timeout=20
+                owner=fx
+     
+     - name: unpack the kernel source
+       shell: tar xf linux-3.18.6.tar.xz 
+       args:
+         chdir: /mnt/resource/build
+         creates: linux-3.18.6
+
+     - name: fetch kernel build script
+       get_url: url=https://gist.githubusercontent.com/fxlv/40f3a332bdd33b405ffb/raw/d5184a27f5de6b0c2a1e1c1bdbcc3566ce2ff89f/gistfile1.sh
+                dest=/mnt/resource/build/linux-3.18.6/kernel-build.sh
+                timeout=20
+                owner=fx
+                mode=755
