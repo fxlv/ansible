@@ -1,0 +1,13 @@
+---
+- hosts: all
+  sudo: yes
+  tasks:
+    - name: collect SAR stats
+      shell: LC_ALL=C sar -o data.sar 2 300 chdir=/root
+      async: 510
+
+    - name: prep sar file
+      shell: LC_ALL=C sar -A -f data.sar > data.sar.txt chdir=/root
+
+    - name: fetch sar files 
+      fetch: src=/root/data.sar.txt dest=/tmp/{{ ansible_hostname }}-data.sar.txt flat=yes
