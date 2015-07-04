@@ -14,7 +14,7 @@
       # create used on FreeBSD
     - name: create user
       user: name=fx comment="FX"
-      su: yes
+      sudo: yes
       when: ansible_distribution=='FreeBSD' 
 
       # take the SSH pub key from OSX
@@ -35,7 +35,7 @@
       copy: src=templates/sudoers_fx.j2 
             dest=/usr/local/etc/sudoers.d/fx 
             owner=root group=wheel mode=440
-      su: yes
+      sudo: yes
       when: ansible_distribution=="FreeBSD"
       
       # remove the sudoers 'waagent' file that is created
