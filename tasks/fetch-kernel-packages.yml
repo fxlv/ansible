@@ -1,0 +1,8 @@
+---
+- hosts: all
+  sudo: yes
+  tasks:
+    - name: fetch kernel headers  
+      fetch: src=/mnt/resource/build/linux-headers-4.2.11_1azure_amd64.deb dest=/tmp/linux-headers-4.2.11_1azure_amd64.deb flat=yes
+    - name: fetch kernel  
+      fetch: src=/mnt/resource/build/linux-image-4.2.11_1azure_amd64.deb dest=/tmp/linux-image-4.2.11_1azure_amd64.deb flat=yes
