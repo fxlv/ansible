@@ -18,21 +18,28 @@
        file: path=/mnt/resource/build state=directory
             owner=fx
      - name: fetch kernel source
-       get_url: url=https://www.kernel.org/pub/linux/kernel/v3.x/linux-3.18.6.tar.xz 
+       get_url: url=https://www.kernel.org/pub/linux/kernel/v4.x/linux-4.2.1.tar.xz
                 dest=/mnt/resource/build
-                sha256sum=c4c1a4841173aa572d79b7530db92ce493dbefe8049e6f461a46dd897df253f5
+                sha256sum=7fdf35bf364cc88a9797dac0bc6c0f9951ae031c1d937f61583a649887bb8dac
                 timeout=20
                 owner=fx
      
      - name: unpack the kernel source
-       shell: tar xf linux-3.18.6.tar.xz 
+       shell: tar xf linux-4.2.1.tar.xz
        args:
          chdir: /mnt/resource/build
-         creates: linux-3.18.6
+         creates: linux-4.2.1
 
      - name: fetch kernel build script
        get_url: url=https://gist.githubusercontent.com/fxlv/40f3a332bdd33b405ffb/raw/d5184a27f5de6b0c2a1e1c1bdbcc3566ce2ff89f/gistfile1.sh
-                dest=/mnt/resource/build/linux-3.18.6/kernel-build.sh
+                dest=/mnt/resource/build/linux-4.2.1/kernel-build.sh
+                timeout=20
+                owner=fx
+                mode=755
+     
+     - name: fetch kernel config
+       get_url: url=http://fx.lv/kernel/linux-4.1.6-azure.config
+                dest=/mnt/resource/build/linux-4.2.1/.config
                 timeout=20
                 owner=fx
                 mode=755
