@@ -6,13 +6,13 @@
      - name: install build dependencies
        apt: name={{item}} state=present
        with_items:
-         - screen
          - bc
          - build-essential
          - vim
          - kernel-package
          - libncurses5-dev 
-         - wget
+         - curl
+         - kernel-package
 
      - name: create directory for kernel building
        file: path=/mnt/resource/build state=directory
@@ -31,14 +31,14 @@
          creates: linux-4.2.1
 
      - name: fetch kernel build script
-       get_url: url=https://gist.githubusercontent.com/fxlv/40f3a332bdd33b405ffb/raw/d5184a27f5de6b0c2a1e1c1bdbcc3566ce2ff89f/gistfile1.sh
-                dest=/mnt/resource/build/linux-4.2.1/kernel-build.sh
+       get_url: url=http://fx.lv/kernel/build.sh
+                dest=/mnt/resource/build/linux-4.2.1/build.sh
                 timeout=20
                 owner=fx
                 mode=755
      
      - name: fetch kernel config
-       get_url: url=http://fx.lv/kernel/linux-4.1.6-azure.config
+       get_url: url=http://fx.lv/kernel/linux-4.2.1.config
                 dest=/mnt/resource/build/linux-4.2.1/.config
                 timeout=20
                 owner=fx
