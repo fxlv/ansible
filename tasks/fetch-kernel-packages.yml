@@ -2,7 +2,15 @@
 - hosts: all
   sudo: yes
   tasks:
+    - shell: ls -d linux-headers*.deb
+      args:
+        chdir: /mnt/resource/build
+      register: headers_package 
     - name: fetch kernel headers  
-      fetch: src=/mnt/resource/build/linux-headers-4.2.11_1azure_amd64.deb dest=/tmp/linux-headers-4.2.11_1azure_amd64.deb flat=yes
+      fetch: src=/mnt/resource/build/{{headers_package.stdout}} dest=/tmp/{{headers_package.stdout}} flat=yes
+    - shell: ls -d linux-image*.deb
+      args:
+        chdir: /mnt/resource/build
+      register: linux_image
     - name: fetch kernel  
-      fetch: src=/mnt/resource/build/linux-image-4.2.11_1azure_amd64.deb dest=/tmp/linux-image-4.2.11_1azure_amd64.deb flat=yes
+      fetch: src=/mnt/resource/build/{{linux_image.stdout}} dest=/tmp/{{linux_image.stdout}} flat=yes
