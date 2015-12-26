@@ -1,0 +1,32 @@
+---
+ - hosts: all
+   gather_facts: yes
+   sudo: yes
+   tasks:
+
+    - name: update the apt cache
+      apt: update_cache=yes 
+           cache_valid_time=300
+      register: apt_update
+      when: ansible_distribution=='Debian' or ansible_distribution=='Ubuntu'
+    
+    - name: install nagios agent and its components
+      apt: name={{item}} state=present
+      with_items:
+         - nagios-nrpe-server
+         - nagios-plugins
+
+    - name: nagios sudoers file
+      copy: src=templates/nrpe.cfg
+            dest=/etc/nagios/nrpe.cfg
+            owner=root group=root mode=644
+      notify:
+        - restart nagios-nrpe-server
+    
+    - name: nagios sudoers file
+      copy: src=templates/nagiosnrpe
+            dest=/etc/sudoers.d/nagiosnrpe
+            owner=root group=root mode=644
+   handlers:
+     - name: restart nagios-nrpe-server
+       service: name=nagios-nrpe-server state=restarted
