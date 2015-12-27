@@ -22,11 +22,19 @@
             owner=root group=root mode=644
       notify:
         - restart nagios-nrpe-server
+        - tail syslog and grep for nrpe
+        - print syslog
     
     - name: nagios sudoers file
       copy: src=templates/nagiosnrpe
             dest=/etc/sudoers.d/nagiosnrpe
             owner=root group=root mode=644
+
    handlers:
      - name: restart nagios-nrpe-server
        service: name=nagios-nrpe-server state=restarted
+     - name: tail syslog and grep for nrpe
+       shell: tail /var/log/syslog -n 50 | grep "nrpe\["
+       register: nrpe_syslog
+     - name: print syslog
+       debug: var=nrpe_syslog.stdout_lines
