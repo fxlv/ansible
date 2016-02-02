@@ -68,11 +68,12 @@ def log(host, category, data):
         else:
             import sys
             print "Unexpected error"
-            print "This is the data we got from ansible:"
-            print data
-            print
-            print "Exiting now, please report this bug!"
-            sys.exit(1)
+            if DEBUG:
+                print "This is the data we got from ansible:"
+                print data
+                print
+                print "Exiting now, please report this bug!"
+                sys.exit(1)
 
 
 class CallbackModule(object):
