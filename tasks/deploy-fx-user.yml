@@ -6,13 +6,13 @@
       ping:
 
       # create user on Debian
-    - name: create user
+    - name: create Debian user
       user: name=fx comment="FX" shell="/bin/bash"
       sudo: yes
-      when: ansible_distribution=='Debian' 
+      when: ansible_distribution=='Debian' or ansible_distribution=='OSMC'
 
       # create used on FreeBSD
-    - name: create user
+    - name: create FreeBSD user
       user: name=fx comment="FX"
       sudo: yes
       when: ansible_distribution=='FreeBSD' 
@@ -28,7 +28,7 @@
             dest=/etc/sudoers.d/fx 
             owner=root group=root mode=440
       sudo: yes
-      when: ansible_distribution=='Debian' 
+      when: ansible_distribution=='Debian' or ansible_distribution=='OSMC'
 
       # on FreeBSD sudoers file is in different location
     - name: sudoers FreeBSD
@@ -44,6 +44,6 @@
       file: path=/etc/sudoers.d/waagent state=absent
       sudo: yes
       when: 
-            ansible_distribution=="Debian" 
+            ansible_distribution=="Debian" or ansible_distribution=='OSMC'
             and ansible_virtualization_type=="VirtualPC"
 
