@@ -1,0 +1,65 @@
+---
+- hosts: all
+  gather_facts: yes
+  sudo: yes
+  tasks:
+    - name: install dependencies
+      apt: name={{item}} state=present
+      with_items:
+      - screen
+      - vim
+      - curl
+
+    - name: create directory for java
+      file: path=/opt/jre state=directory
+          owner=root
+    - name: get java version
+      shell: java -version 2>&1|head -n 1|awk -F '"' '{ print $2 }'
+      register: java
+
+    - debug: var=java.stdout
+
+
+    - name: fetch jre
+      get_url: url=http://fx.lv/jre-8u60-linux-x64.tar.gz
+              dest=/opt/jre
+              sha256sum=49dadecd043152b3b448288a35a4ee6f3845ce6395734bacc1eae340dff3cbf5
+              timeout=30
+              owner=fx
+      when: java.stdout != "1.8.0_60"
+
+    - name: untar jre
+      shell: tar xf jre-8u60-linux-x64.tar.gz
+      args:
+        chdir: /opt/jre
+        creates: jre1.8.0_60
+      when: java.stdout != "1.8.0_60"
+      register: jre_unpack
+
+    - shell: 'update-alternatives --install "/usr/bin/java" "java" "/opt/jre/jre1.8.0_60/bin/java" 1' 
+      register: output
+      when: jre_unpack|changed
+    - debug: var=output.stdout
+
+    - shell: 'update-alternatives --set java /opt/jre/jre1.8.0_60/bin/java' 
+      register: output
+      when: jre_unpack|changed
+    - debug: var=output.stdout
+
+    - name: add cassandra apt key
+      apt_key: keyserver=pgp.mit.edu id=749D6EEC0353B12C
+
+    - name: add apache cassandra deb repo
+      lineinfile: dest=/etc/apt/sources.list line="deb http://www.apache.org/dist/cassandra/debian 21x main"
+    - name: install cassandra deps
+      apt: name={{item}}
+      with_items:
+        - libxi6 
+        - libxml2 
+        - libxtst6 
+        - ntp
+        - libpulse0 
+        - libsm6 
+        - libsndfile1
+    - apt: name=cassandra update_cache=yes
+
