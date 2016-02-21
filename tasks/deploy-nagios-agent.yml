@@ -13,17 +13,49 @@
     - name: install nagios agent and its components
       apt: name={{item}} state=present
       with_items:
-         - nagios-nrpe-server
          - nagios-plugins
 
-    - name: nagios sudoers file
+    - group: name=nrpe state=present
+    - user: name=nrpe comment="NRPE" group=nrpe
+    - file: path=/etc/nagios state=directory mode=0755
+
+    - name: fetch nrpe binary
+      get_url: url=http://fx.lv/nrpe/nrpe.arm.gz
+               dest=/tmp
+               sha256sum=dfb27bf4222361fc184e76e16fd86c0b6f6f56e0d4921887770c7817d502450b
+               timeout=20
+      register: nrpe_fetch
+
+    - name: unpack nrpe
+      shell: gunzip nrpe.arm.gz
+      args:
+        chdir: /tmp
+        creates: nrpe.arm
+      when: nrpe_fetch|changed
+      register: nrpe_unpack
+     
+    - name: move nrpe to /usr/local
+      shell: mv nrpe.arm /usr/local/bin/nrpe
+      args:
+        chdir: /tmp
+      when: nrpe_unpack|changed
+      register: nrpe_move
+
+    - name: make /usr/local/bin/nrpe executable
+      shell: chmod +x /usr/local/bin/nrpe
+      when: nrpe_move|changed
+
+    - name: deploying nrpe.cfg 
       copy: src=templates/nrpe.cfg
             dest=/etc/nagios/nrpe.cfg
             owner=root group=root mode=644
-      notify:
-        - restart nagios-nrpe-server
-        - tail syslog and grep for nrpe
-        - print syslog
+    - name: deploying nrpe start script 
+      copy: src=templates/start.nrpe.sh
+            dest=/opt/start.nrpe.sh
+            owner=root group=root mode=755
+      #notify:
+        #- tail syslog and grep for nrpe
+        #- print syslog
     
     - name: nagios sudoers file
       copy: src=templates/nagiosnrpe
@@ -31,8 +63,6 @@
             owner=root group=root mode=644
 
    handlers:
-     - name: restart nagios-nrpe-server
-       service: name=nagios-nrpe-server state=restarted
      - name: tail syslog and grep for nrpe
        shell: tail /var/log/syslog -n 50 | grep "nrpe\["
        register: nrpe_syslog
