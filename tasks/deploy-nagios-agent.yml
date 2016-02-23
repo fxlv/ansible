@@ -46,9 +46,10 @@
       when: nrpe_move|changed
 
     - name: deploying nrpe.cfg 
-      copy: src=templates/nrpe.cfg
+      template: src=templates/nrpe.cfg
             dest=/etc/nagios/nrpe.cfg
             owner=root group=root mode=644
+
     - name: deploying nrpe start script 
       copy: src=templates/start.nrpe.sh
             dest=/opt/start.nrpe.sh
