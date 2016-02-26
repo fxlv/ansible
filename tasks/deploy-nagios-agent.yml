@@ -19,31 +19,53 @@
     - user: name=nrpe comment="NRPE" group=nrpe
     - file: path=/etc/nagios state=directory mode=0755
 
-    - name: fetch nrpe binary
+    - name: fetch arm nrpe binary
       get_url: url=http://fx.lv/nrpe/nrpe.arm.gz
                dest=/tmp
                sha256sum=dfb27bf4222361fc184e76e16fd86c0b6f6f56e0d4921887770c7817d502450b
                timeout=20
-      register: nrpe_fetch
+      register: nrpe_fetch_arm
+      when: ansible_architecture == "armv7l"
+    
+    - name: fetch x86 nrpe binary
+      get_url: url=http://fx.lv/nrpe/nrpe.x86.gz
+               dest=/tmp
+               sha256sum=7baea2bdcaa8fcc0a66be9a7c5ab14a82eceb0cd36f12149aca6b0ef28247b54
+               timeout=20
+      register: nrpe_fetch_x86
+      when: ansible_architecture == "x86_64"
 
     - name: unpack nrpe
       shell: gunzip nrpe.arm.gz
       args:
         chdir: /tmp
         creates: nrpe.arm
-      when: nrpe_fetch|changed
-      register: nrpe_unpack
+      when: nrpe_fetch_arm|changed
+      register: nrpe_unpack_arm
+    
+    - name: unpack nrpe
+      shell: gunzip nrpe.x86.gz
+      args:
+        chdir: /tmp
+        creates: nrpe.x86
+      when: nrpe_fetch_x86|changed
+      register: nrpe_unpack_x86
      
     - name: move nrpe to /usr/local
       shell: mv nrpe.arm /usr/local/bin/nrpe
       args:
         chdir: /tmp
-      when: nrpe_unpack|changed
-      register: nrpe_move
+      when: nrpe_unpack_arm|changed
+    
+    - name: move nrpe to /usr/local
+      shell: mv nrpe.x86 /usr/local/bin/nrpe
+      args:
+        chdir: /tmp
+      when: nrpe_unpack_x86|changed
 
     - name: make /usr/local/bin/nrpe executable
       shell: chmod +x /usr/local/bin/nrpe
-      when: nrpe_move|changed
+      # TODO: do this only when executable bit is not set
 
     - name: deploying nrpe.cfg 
       template: src=templates/nrpe.cfg
