@@ -1,7 +1,8 @@
 ---
 - hosts: all
   gather_facts: yes
-  sudo: yes
+  become: yes
+  strategy: free
 
   tasks:
     - name: update the apt cache

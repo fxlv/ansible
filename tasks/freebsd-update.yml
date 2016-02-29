@@ -4,7 +4,7 @@
 # This only works for 10.x as it does binary updates.
 #
 - hosts: all
-  sudo: yes
+  become: yes
 
   tasks:
     - name: Fetch any new FreeBSD updates

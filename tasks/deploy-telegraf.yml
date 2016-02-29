@@ -4,7 +4,7 @@
 #
 - hosts: all
   gather_facts: yes
-  sudo: yes
+  become: yes
   tasks:
 
   - name: check if telegraf is telegraf_installed
