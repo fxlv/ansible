@@ -3,11 +3,13 @@
    gather_facts: yes
    become: yes
    tasks:
+     - name: install build-essential 
+       apt: name=build-essential state=present
+
      - name: install build dependencies
        apt: name={{item}} state=present
        with_items:
          - bc
-         - build-essential
          - vim
          - kernel-package
          - libncurses5-dev 
