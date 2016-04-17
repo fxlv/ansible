@@ -1,12 +1,13 @@
 import os
 import json
 import datetime
+from ansible.plugins.callback import CallbackBase
 
 TIMESTAMP_FORMAT = "%b %d %Y %H:%M:%S"
 LOG_LINE = "{timestamp} {name} {msg}\n"
 ANSIBLE_PER_HOST_LOG_DIR = os.environ["ANSIBLE_PER_HOST_LOG_DIR"]
 
-DEBUG=False
+DEBUG = False
 
 def write_log(host,module_name, category, name=False,msg=False):
     if not name or not msg:
@@ -50,6 +51,7 @@ def log(host, category, data):
                 print "..."
         else:
             module_name='none'
+            module_args='none'
         write_log(host, module_name, category, "Module name",module_name)
         write_log(host, module_name, category, "Module args",module_args)
         write_log(host, module_name, category, "Changed",changed)
@@ -76,7 +78,7 @@ def log(host, category, data):
                 sys.exit(1)
 
 
-class CallbackModule(object):
+class CallbackModule(CallbackBase):
     """
     logs playbook results, per host, in ./log/ansible/hosts
     """
