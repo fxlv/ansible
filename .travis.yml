@@ -1,0 +1,10 @@
+language: yaml
+
+os:
+  - linux
+
+before_script:
+  - sudo pip install yamllint
+
+script:
+ - yamllint tasks/*.yml
