@@ -15,35 +15,34 @@
     - name: create FreeBSD user
       user: name=fx comment="FX"
       sudo: yes
-      when: ansible_distribution=='FreeBSD' 
+      when: ansible_distribution=='FreeBSD'
 
       # take the SSH pub key from OSX
     - name: set up ssh key
-      authorized_key: user=fx 
-                      key="{{lookup('file','/Users/fx/.ssh/id_rsa.pub')}}" 
+      authorized_key: user=fx
+                      key="{{lookup('file','/Users/fx/.ssh/id_rsa.pub')}}"
       sudo: yes
       # set up sudoers file only for Debian machines
     - name: sudoers Debian
-      copy: src=templates/sudoers_fx.j2 
-            dest=/etc/sudoers.d/fx 
+      copy: src=templates/sudoers_fx.j2
+            dest=/etc/sudoers.d/fx
             owner=root group=root mode=440
       sudo: yes
       when: ansible_distribution=='Debian' or ansible_distribution=='OSMC'
 
       # on FreeBSD sudoers file is in different location
     - name: sudoers FreeBSD
-      copy: src=templates/sudoers_fx.j2 
-            dest=/usr/local/etc/sudoers.d/fx 
+      copy: src=templates/sudoers_fx.j2
+            dest=/usr/local/etc/sudoers.d/fx
             owner=root group=wheel mode=440
       sudo: yes
       when: ansible_distribution=="FreeBSD"
-      
+
       # remove the sudoers 'waagent' file that is created
       # for new Azure machines as it will clash with our own
     - name: remove /etc/sudoers.d/waagent
       file: path=/etc/sudoers.d/waagent state=absent
       sudo: yes
-      when: 
+      when:
             ansible_distribution=="Debian" or ansible_distribution=='OSMC'
             and ansible_virtualization_type=="VirtualPC"
-

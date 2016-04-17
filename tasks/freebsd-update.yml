@@ -8,14 +8,14 @@
 
   tasks:
     - name: Fetch any new FreeBSD updates
-      shell: freebsd-update fetch 
+      shell: freebsd-update fetch
       when: ansible_distribution == 'FreeBSD'
       register: result_update
       changed_when: "'No updates needed' not in result_update.stdout"
 
     - debug: var=result_update
       when: result_update.changed
-    
+
     - name: Install FreeBSD updates
       shell: freebsd-update install
       when: ansible_distribution == 'FreeBSD' and result_update.changed
@@ -23,7 +23,7 @@
 
     - debug: var=result_update_install
       when: result_update_install.changed
-    
+
     - name: Upgrade FreeBSD packages
       shell: pkg upgrade
       when: ansible_distribution == 'FreeBSD'
@@ -32,4 +32,3 @@
 
     - debug: var=result_pkg
       when: result_pkg.changed
-

@@ -3,5 +3,4 @@
   gather_facts: no
   tasks:
     - name: ping
-      ping:  
-
+      ping:

@@ -24,3 +24,4 @@
       fetch: src=/var/log/apt-upgrade_{{ansible_date_time.date}}-{{ansible_date_time.time}}.log 
             dest={{log_dir}}/{{ansible_date_time.month}}/{{ansible_date_time.day}}/{{ansible_hostname}}/apt-upgrade-{{ansible_date_time.date}}-{{ansible_date_time.time}}.log flat=yes
       when: ansible_distribution=='Debian' or ansible_distribution=='Ubuntu'
+

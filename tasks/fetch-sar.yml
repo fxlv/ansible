@@ -9,5 +9,5 @@
     - name: prep sar file
       shell: LC_ALL=C sar -A -f data.sar > data.sar.txt chdir=/root
 
-    - name: fetch sar files 
+    - name: fetch sar files
       fetch: src=/root/data.sar.txt dest=/tmp/{{ ansible_hostname }}-data.sar.txt flat=yes
