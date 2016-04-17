@@ -4,7 +4,5 @@
   become: yes
 
   tasks:
-    
     - locale_gen: name=en_US.UTF-8 state=present
       when: ansible_distribution=='Debian' or ansible_distribution=='Ubuntu'
-

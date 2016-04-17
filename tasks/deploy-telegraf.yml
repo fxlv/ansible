@@ -13,25 +13,28 @@
     ignore_errors: True
 
   - name: Fetch Telegraf package
-    get_url:  url=http://get.influxdb.org/telegraf/telegraf_0.2.4_amd64.deb 
-              dest=/tmp 
-              sha256sum=2b1b04778aa2e2aa7e52f63971c911c571fee2d60e6dfde801daac9a8be972ee
+    get_url: >
+      url=http://get.influxdb.org/telegraf/telegraf_0.2.4_amd64.deb
+      dest=/tmp
+      sha256sum=2b1b04778aa2e2aa7e52f63971c911c571fee2d60e6dfde801daac9a8be972ee
     when: telegraf_installed.stdout == '0'
     register: telegraf_fetch
-  
+
   - name: Fetch sockstat.py
-    get_url:  url=https://raw.githubusercontent.com/fxlv/monitoring/master/sockstat.py
-              dest=/opt/telegraf
-              sha256sum=65fc3c023d113ef8d6f6a00aaf9e3827e2f3635abbde492c790307992349c097
+    get_url: >
+      url=https://raw.githubusercontent.com/fxlv/monitoring/master/sockstat.py
+      dest=/opt/telegraf
+      sha256sum=65fc3c023d113ef8d6f6a00aaf9e3827e2f3635abbde492c790307992349c097
 
   - name: set proper permissions for sockstat.py
     file: path=/opt/telegraf/sockstat.py
           owner=root group=root mode=0755
-  
+
   - name: Fetch files.py
-    get_url:  url=https://raw.githubusercontent.com/fxlv/monitoring/master/files.py
-              dest=/opt/telegraf
-              sha256sum=1c5f5112d2b7ad21b219d2a429f6079f250425b28f21cadae9eca56fa140c1f9
+    get_url: >
+      url=https://raw.githubusercontent.com/fxlv/monitoring/master/files.py
+      dest=/opt/telegraf
+      sha256sum=1c5f5112d2b7ad21b219d2a429f6079f250425b28f21cadae9eca56fa140c1f9
 
   - name: set proper permissions for files.py
     file: path=/opt/telegraf/files.py
@@ -43,8 +46,8 @@
     register: telegraf_install
 
   - name: Configure Telegraf
-    copy: src=templates/telegraf.conf 
-          dest=/etc/opt/telegraf/telegraf.conf 
+    copy: src=templates/telegraf.conf
+          dest=/etc/opt/telegraf/telegraf.conf
           owner=root group=root mode=644
     notify:
       - restart telegraf
@@ -52,4 +55,3 @@
   handlers:
     - name: restart telegraf
       service: name=telegraf state=restarted
-
