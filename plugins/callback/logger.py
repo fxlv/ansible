@@ -9,20 +9,24 @@ ANSIBLE_PER_HOST_LOG_DIR = os.environ["ANSIBLE_PER_HOST_LOG_DIR"]
 
 DEBUG = False
 
-def write_log(host,module_name, category, name=False,msg=False):
+
+def write_log(host, module_name, category, name=False, msg=False):
     if not name or not msg:
         return
     now = datetime.datetime.now()
     todays_log_dir = now.strftime("%m/%d")
-    log_path = "{0}/{1}/{2}".format(ANSIBLE_PER_HOST_LOG_DIR,todays_log_dir,host)
-    log_file = "{0}/ansible-{1}-{2}.log".format(log_path,module_name,category)
+    log_path = "{0}/{1}/{2}".format(ANSIBLE_PER_HOST_LOG_DIR, todays_log_dir,
+                                    host)
+    log_file = "{0}/ansible-{1}-{2}.log".format(log_path, module_name,
+                                                category)
     if not os.path.exists(log_path):
         os.makedirs(log_path)
     fd = open(log_file, "a")
     timestamp = now.strftime(TIMESTAMP_FORMAT)
-    line = LOG_LINE.format(timestamp=timestamp,name=name,msg=msg)
+    line = LOG_LINE.format(timestamp=timestamp, name=name, msg=msg)
     fd.write(line)
     fd.close()
+
 
 def log(host, category, data):
     if type(data) == dict:
@@ -34,39 +38,41 @@ def log(host, category, data):
         msg = data.pop('msg', None)
         if DEBUG:
             print
-            print "msg",msg
-            print "changed",changed
-            print "invocation",invocation
-            print "stdout",stdout
-            print "stderr",stderr
+            print "msg", msg
+            print "changed", changed
+            print "invocation", invocation
+            print "stdout", stdout
+            print "stderr", stderr
             print
-            print "keys left:",data.keys()
+            print "keys left:", data.keys()
         if invocation:
-            module_name=invocation['module_name']
-            module_args=invocation['module_args']
+            module_name = invocation['module_name']
+            module_args = invocation['module_args']
             if DEBUG:
                 print "name and args"
                 print module_name
                 print module_args
                 print "..."
         else:
-            module_name='none'
-            module_args='none'
-        write_log(host, module_name, category, "Module name",module_name)
-        write_log(host, module_name, category, "Module args",module_args)
-        write_log(host, module_name, category, "Changed",changed)
-        write_log(host, module_name, category, "Message",msg)
-        write_log(host, module_name, category, "Stdout",stdout)
-        write_log(host, module_name, category, "Stderr",stderr)
+            module_name = 'none'
+            module_args = 'none'
+        write_log(host, module_name, category, "Module name", module_name)
+        write_log(host, module_name, category, "Module args", module_args)
+        write_log(host, module_name, category, "Changed", changed)
+        write_log(host, module_name, category, "Message", msg)
+        write_log(host, module_name, category, "Stdout", stdout)
+        write_log(host, module_name, category, "Stderr", stderr)
         data = json.dumps(data)
         if invocation is not None:
             rest_of_data = json.dumps(invocation) + " => %s " % data
+            if DEBUG:
+                print "This data is never used: {0}".format(rest_of_data)
     else:
-        # if data == "..." then this means ansible skipped some task 
+        # if data == "..." then this means ansible skipped some task
         if data == "...":
             print "Stuff got skipped"
         elif data.startswith("error while evaluating conditional"):
-            print "Error:",data
+            print "Error:", data
         else:
             import sys
             print "Unexpected error"
@@ -125,7 +131,15 @@ class CallbackModule(CallbackBase):
     def playbook_on_task_start(self, name, is_conditional):
         pass
 
-    def playbook_on_vars_prompt(self, varname, private=True, prompt=None, encrypt=None, confirm=False, salt_size=None, salt=None, default=None):
+    def playbook_on_vars_prompt(self,
+                                varname,
+                                private=True,
+                                prompt=None,
+                                encrypt=None,
+                                confirm=False,
+                                salt_size=None,
+                                salt=None,
+                                default=None):
         pass
 
     def playbook_on_setup(self):
@@ -142,4 +156,3 @@ class CallbackModule(CallbackBase):
 
     def playbook_on_stats(self, stats):
         pass
-
