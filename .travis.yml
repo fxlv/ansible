@@ -5,6 +5,8 @@ os:
 
 before_script:
   - sudo pip install yamllint
+  - sudo pip install flake8 
 
 script:
- - yamllint tasks/*.yml
+  - yamllint -c .yamllint.yml tasks/*.yml
+ - flake8 plugins/callback/logger.py
