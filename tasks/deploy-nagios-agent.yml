@@ -1,93 +1,93 @@
 ---
- - hosts: all
-   gather_facts: yes
-   become: yes
-   tasks:
+- hosts: all
+  gather_facts: yes
+  become: yes
+  tasks:
 
-    - name: update the apt cache
-      apt: update_cache=yes 
-           cache_valid_time=300
-      register: apt_update
-      when: ansible_distribution=='Debian' or ansible_distribution=='Ubuntu'
-    
-    - name: install nagios agent and its components
-      apt: name={{item}} state=present
-      with_items:
-         - nagios-plugins
+  - name: update the apt cache
+    apt: update_cache=yes
+          cache_valid_time=300
+    register: apt_update
+    when: ansible_distribution=='Debian' or ansible_distribution=='Ubuntu'
 
-    - group: name=nrpe state=present
-    - user: name=nrpe comment="NRPE" group=nrpe
-    - file: path=/etc/nagios state=directory mode=0755
+  - name: install nagios agent and its components
+    apt: name={{item}} state=present
+    with_items:
+    - nagios-plugins
 
-    - name: fetch arm nrpe binary
-      get_url: url=http://fx.lv/nrpe/nrpe.arm.gz
-               dest=/tmp
-               sha256sum=dfb27bf4222361fc184e76e16fd86c0b6f6f56e0d4921887770c7817d502450b
-               timeout=20
-      register: nrpe_fetch_arm
-      when: ansible_architecture == "armv7l"
+  - group: name=nrpe state=present
+  - user: name=nrpe comment="NRPE" group=nrpe
+  - file: path=/etc/nagios state=directory mode=0755
 
-    - name: fetch x86 nrpe binary
-      get_url: url=http://fx.lv/nrpe/nrpe.x86.gz
-               dest=/tmp
-               sha256sum=7baea2bdcaa8fcc0a66be9a7c5ab14a82eceb0cd36f12149aca6b0ef28247b54
-               timeout=20
-      register: nrpe_fetch_x86
-      when: ansible_architecture == "x86_64"
+  - name: fetch arm nrpe binary
+    get_url: url=http://fx.lv/nrpe/nrpe.arm.gz
+              dest=/tmp
+              sha256sum=dfb27bf4222361fc184e76e16fd86c0b6f6f56e0d4921887770c7817d502450b
+              timeout=20
+    register: nrpe_fetch_arm
+    when: ansible_architecture == "armv7l"
 
-    - name: unpack nrpe
-      shell: gunzip nrpe.arm.gz
-      args:
-        chdir: /tmp
-        creates: nrpe.arm
-      when: nrpe_fetch_arm|changed
-      register: nrpe_unpack_arm
+  - name: fetch x86 nrpe binary
+    get_url: url=http://fx.lv/nrpe/nrpe.x86.gz
+              dest=/tmp
+              sha256sum=7baea2bdcaa8fcc0a66be9a7c5ab14a82eceb0cd36f12149aca6b0ef28247b54
+              timeout=20
+    register: nrpe_fetch_x86
+    when: ansible_architecture == "x86_64"
 
-    - name: unpack nrpe
-      shell: gunzip nrpe.x86.gz
-      args:
-        chdir: /tmp
-        creates: nrpe.x86
-      when: nrpe_fetch_x86|changed
-      register: nrpe_unpack_x86
+  - name: unpack nrpe
+    shell: gunzip nrpe.arm.gz
+    args:
+    chdir: /tmp
+    creates: nrpe.arm
+    when: nrpe_fetch_arm|changed
+    register: nrpe_unpack_arm
 
-    - name: move nrpe to /usr/local
-      shell: mv nrpe.arm /usr/local/bin/nrpe
-      args:
-        chdir: /tmp
-      when: nrpe_unpack_arm|changed
+  - name: unpack nrpe
+    shell: gunzip nrpe.x86.gz
+    args:
+    chdir: /tmp
+    creates: nrpe.x86
+    when: nrpe_fetch_x86|changed
+    register: nrpe_unpack_x86
 
-    - name: move nrpe to /usr/local
-      shell: mv nrpe.x86 /usr/local/bin/nrpe
-      args:
-        chdir: /tmp
-      when: nrpe_unpack_x86|changed
+  - name: move nrpe to /usr/local
+    shell: mv nrpe.arm /usr/local/bin/nrpe
+    args:
+    chdir: /tmp
+    when: nrpe_unpack_arm|changed
 
-    - name: make /usr/local/bin/nrpe executable
-      shell: chmod +x /usr/local/bin/nrpe
-      # TODO: do this only when executable bit is not set
+  - name: move nrpe to /usr/local
+    shell: mv nrpe.x86 /usr/local/bin/nrpe
+    args:
+    chdir: /tmp
+    when: nrpe_unpack_x86|changed
 
-    - name: deploying nrpe.cfg 
-      template: src=templates/nrpe.cfg
-            dest=/etc/nagios/nrpe.cfg
-            owner=root group=root mode=644
+  - name: make /usr/local/bin/nrpe executable
+    shell: chmod +x /usr/local/bin/nrpe
+    # TODO: do this only when executable bit is not set
 
-    - name: deploying nrpe start script 
-      copy: src=templates/start.nrpe.sh
-            dest=/opt/start.nrpe.sh
-            owner=root group=root mode=755
-      #notify:
-        #- tail syslog and grep for nrpe
-        #- print syslog
+  - name: deploying nrpe.cfg
+    template: src=templates/nrpe.cfg
+          dest=/etc/nagios/nrpe.cfg
+          owner=root group=root mode=644
 
-    - name: nagios sudoers file
-      copy: src=templates/nagiosnrpe
-            dest=/etc/sudoers.d/nagiosnrpe
-            owner=root group=root mode=644
+  - name: deploying nrpe start script
+    copy: src=templates/start.nrpe.sh
+          dest=/opt/start.nrpe.sh
+          owner=root group=root mode=755
+  # notify:
+  # - tail syslog and grep for nrpe
+  # - print syslog
 
-   handlers:
-     - name: tail syslog and grep for nrpe
-       shell: tail /var/log/syslog -n 50 | grep "nrpe\["
-       register: nrpe_syslog
-     - name: print syslog
-       debug: var=nrpe_syslog.stdout_lines
+  - name: nagios sudoers file
+    copy: src=templates/nagiosnrpe
+          dest=/etc/sudoers.d/nagiosnrpe
+          owner=root group=root mode=644
+
+  handlers:
+  - name: tail syslog and grep for nrpe
+    shell: tail /var/log/syslog -n 50 | grep "nrpe\["
+    register: nrpe_syslog
+  - name: print syslog
+    debug: var=nrpe_syslog.stdout_lines

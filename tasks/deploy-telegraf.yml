@@ -50,8 +50,8 @@
           dest=/etc/opt/telegraf/telegraf.conf
           owner=root group=root mode=644
     notify:
-      - restart telegraf
+    - restart telegraf
 
   handlers:
-    - name: restart telegraf
-      service: name=telegraf state=restarted
+  - name: restart telegraf
+    service: name=telegraf state=restarted

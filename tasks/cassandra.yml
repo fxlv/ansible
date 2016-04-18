@@ -6,9 +6,9 @@
     - name: install dependencies
       apt: name={{item}} state=present
       with_items:
-      - screen
-      - vim
-      - curl
+        - screen
+        - vim
+        - curl
 
     - name: create directory for java
       file: path=/opt/jre state=directory
@@ -36,12 +36,12 @@
       when: java.stdout != "1.8.0_60"
       register: jre_unpack
 
-    - shell: 'update-alternatives --install "/usr/bin/java" "java" "/opt/jre/jre1.8.0_60/bin/java" 1' 
+    - shell: 'update-alternatives --install "/usr/bin/java" "java" "/opt/jre/jre1.8.0_60/bin/java" 1'
       register: output
       when: jre_unpack|changed
     - debug: var=output.stdout
 
-    - shell: 'update-alternatives --set java /opt/jre/jre1.8.0_60/bin/java' 
+    - shell: 'update-alternatives --set java /opt/jre/jre1.8.0_60/bin/java'
       register: output
       when: jre_unpack|changed
     - debug: var=output.stdout
@@ -54,12 +54,11 @@
     - name: install cassandra deps
       apt: name={{item}}
       with_items:
-        - libxi6 
-        - libxml2 
-        - libxtst6 
+        - libxi6
+        - libxml2
+        - libxtst6
         - ntp
-        - libpulse0 
-        - libsm6 
+        - libpulse0
+        - libsm6
         - libsndfile1
     - apt: name=cassandra update_cache=yes
-

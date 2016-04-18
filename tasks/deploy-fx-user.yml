@@ -44,5 +44,5 @@
       file: path=/etc/sudoers.d/waagent state=absent
       sudo: yes
       when:
-            ansible_distribution=="Debian" or ansible_distribution=='OSMC'
-            and ansible_virtualization_type=="VirtualPC"
+        ansible_distribution=="Debian" or ansible_distribution=='OSMC'
+        and ansible_virtualization_type=="VirtualPC"
