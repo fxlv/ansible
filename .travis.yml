@@ -1,3 +1,5 @@
+---
+
 language: yaml
 
 os:
@@ -5,8 +7,7 @@ os:
 
 before_script:
   - sudo pip install yamllint
-  - sudo pip install flake8 
-
+  - sudo pip install flake8
 script:
   - yamllint -c .yamllint.yml tasks/*.yml
- - flake8 plugins/callback/logger.py
+  - flake8 plugins/callback/logger.py
