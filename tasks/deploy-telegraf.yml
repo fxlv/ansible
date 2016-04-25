@@ -7,6 +7,10 @@
   become: yes
   tasks:
 
+  - group: name=telegraf state=present
+  - user: name=telegraf comment="Telegraf" group=telegraf
+  - file: path=/opt/telegraf state=directory mode=0755 owner=telegraf group=telegraf
+
   - name: check if telegraf is telegraf_installed
     shell: dpkg -l |grep -c telegraf
     register: telegraf_installed
@@ -14,15 +18,23 @@
 
   - name: Fetch Telegraf package
     get_url: >
-      url=http://get.influxdb.org/telegraf/telegraf_0.2.4_amd64.deb
+      url=http://get.influxdb.org/telegraf/telegraf_0.12.1-1_amd64.deb
       dest=/tmp
-      sha256sum=2b1b04778aa2e2aa7e52f63971c911c571fee2d60e6dfde801daac9a8be972ee
-    when: telegraf_installed.stdout == '0'
+      sha256sum=275d06f2a8418135c2710a9b8235a1738a1bf9dcd442ba44f7215c55fe591a75
+    when: telegraf_installed.stdout == '0' and ansible_architecture == "x86_64"
+    register: telegraf_fetch
+  
+  - name: Fetch Telegraf package
+    get_url: >
+      url=http://get.influxdb.org/telegraf/telegraf_0.12.1-1_armhf.deb
+      dest=/tmp
+      sha256sum=ec9bd0d59d4dad44f18c2c4b6c99b433c7c0c9bf08e6f1178390255ab00d9372
+    when: telegraf_installed.stdout == '0' and ansible_architecture == "armv7l"
     register: telegraf_fetch
 
   - name: Fetch sockstat.py
     get_url: >
-      url=https://raw.githubusercontent.com/fxlv/monitoring/master/sockstat.py
+      url=https://raw.githubusercontent.com/fxlv/monitoring/master/scripts/sockstat.py
       dest=/opt/telegraf
       sha256sum=65fc3c023d113ef8d6f6a00aaf9e3827e2f3635abbde492c790307992349c097
 
@@ -32,7 +44,7 @@
 
   - name: Fetch files.py
     get_url: >
-      url=https://raw.githubusercontent.com/fxlv/monitoring/master/files.py
+      url=https://raw.githubusercontent.com/fxlv/monitoring/master/scripts/files.py
       dest=/opt/telegraf
       sha256sum=1c5f5112d2b7ad21b219d2a429f6079f250425b28f21cadae9eca56fa140c1f9
 
@@ -41,9 +53,16 @@
           owner=root group=root mode=0755
 
   - name: install Telegraf
-    apt: deb=/tmp/telegraf_0.2.4_amd64.deb
+    apt: deb=/tmp/telegraf_0.12.1-1_amd64.deb
     when: telegraf_installed.stdout == '0'
     register: telegraf_install
+    when: ansible_architecture == "x86_64"
+  
+  - name: install Telegraf
+    apt: deb=/tmp/telegraf_0.12.1-1_armhf.deb
+    when: telegraf_installed.stdout == '0'
+    register: telegraf_install
+    when: ansible_architecture == "armv7l"
 
   - name: Configure Telegraf
     copy: src=templates/telegraf.conf
