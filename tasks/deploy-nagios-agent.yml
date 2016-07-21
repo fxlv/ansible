@@ -54,8 +54,7 @@
     when: nrpe_unpack_x86|changed
 
   - name: make /usr/local/bin/nrpe executable
-    shell: chmod +x /usr/local/bin/nrpe
-    # TODO: do this only when executable bit is not set
+    file: path=/usr/local/bin/nrpe mode=0755
 
   - name: deploying nrpe.cfg
     template: src=templates/nrpe.cfg
