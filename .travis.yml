@@ -6,8 +6,9 @@ os:
   - linux
 
 before_script:
-  - sudo pip install yamllint
+  - sudo pip install yamllint ansible-lint
   - sudo pip install flake8
 script:
   - yamllint -c .yamllint.yml tasks/*.yml
+  - ansible-lint tasks/*.yml
   - flake8 plugins/callback/logger.py
