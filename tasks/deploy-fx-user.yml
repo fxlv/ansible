@@ -37,6 +37,12 @@
             owner=root group=wheel mode=440
       become: true
       when: ansible_distribution=="FreeBSD"
+      
+      # On Digitalocean, sudoers.d by default is not honored
+    - name: Make sure includes are used for sudoers
+      lineinfile: dest=/usr/local/etc/sudoers line="#includedir /usr/local/etc/sudoers.d"
+      when: ansible_distribution=="FreeBSD"
+      become: true
 
       # remove the sudoers 'waagent' file that is created
       # for new Azure machines as it will clash with our own
