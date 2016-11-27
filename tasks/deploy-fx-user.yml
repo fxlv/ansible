@@ -9,7 +9,7 @@
     - name: create Debian user
       user: name=fx comment="FX" shell="/bin/bash"
       become: true
-      when: ansible_distribution=='Debian' or ansible_distribution=='OSMC'
+      when: ansible_distribution=='Debian' or ansible_distribution=='OSMC' or ansible_distribution=='Ubuntu'
 
       # create used on FreeBSD
     - name: create FreeBSD user
@@ -28,7 +28,7 @@
             dest=/etc/sudoers.d/fx
             owner=root group=root mode=440
       become: true
-      when: ansible_distribution=='Debian' or ansible_distribution=='OSMC'
+      when: ansible_distribution=='Debian' or ansible_distribution=='OSMC' or ansible_distribution=='Ubuntu'
 
       # on FreeBSD sudoers file is in different location
     - name: sudoers FreeBSD
@@ -44,5 +44,5 @@
       file: path=/etc/sudoers.d/waagent state=absent
       become: true
       when:
-        ansible_distribution=="Debian" or ansible_distribution=='OSMC'
+        ansible_distribution=="Debian" or ansible_distribution=='OSMC' or ansible_distribution=='Ubuntu'
         and ansible_virtualization_type=="VirtualPC"
