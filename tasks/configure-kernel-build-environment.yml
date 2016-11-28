@@ -27,4 +27,9 @@
               owner=fx
       register: kernel_fetch
 
-
+    - name: unpack the kernel source
+      shell: tar xf linux-4.8.11.tar.xz
+      args:
+        chdir: /build
+        creates: linux-4.8.11
+      when: kernel_fetch|changed
