@@ -70,7 +70,7 @@
   - name: Configure Telegraf
     copy: src=templates/telegraf.conf
           dest=/etc/telegraf/telegraf.conf
-          owner=root group=root mode=644
+          owner=root group=root mode=0644
     notify:
     - restart telegraf
 

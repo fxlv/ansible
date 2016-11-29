@@ -59,12 +59,12 @@
   - name: deploying nrpe.cfg
     template: src=templates/nrpe.cfg
           dest=/etc/nagios/nrpe.cfg
-          owner=root group=root mode=644
+          owner=root group=root mode=0644
 
   - name: deploying nrpe start script
     copy: src=templates/start.nrpe.sh
           dest=/opt/start.nrpe.sh
-          owner=root group=root mode=755
+          owner=root group=root mode=0755
   # notify:
   # - tail syslog and grep for nrpe
   # - print syslog
@@ -72,7 +72,7 @@
   - name: nagios sudoers file
     copy: src=templates/nagiosnrpe
           dest=/etc/sudoers.d/nagiosnrpe
-          owner=root group=root mode=644
+          owner=root group=root mode=0644
 
   handlers:
   - name: tail syslog and grep for nrpe

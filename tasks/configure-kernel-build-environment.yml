@@ -27,7 +27,7 @@
         - libslang2-dev
         - systemtap-sdt-dev
         - binutils-dev
-        - libperl-dev 
+        - libperl-dev
         - libnuma-dev
 
     - name: install libiberty on Jessie only
@@ -37,7 +37,7 @@
     - name: create directory for kernel building
       file: path=/build state=directory
           owner=fx
-    
+
     - name: fetch kernel source
       get_url: url=https://cdn.kernel.org/pub/linux/kernel/v4.x/linux-4.8.11.tar.xz
               dest=/build
