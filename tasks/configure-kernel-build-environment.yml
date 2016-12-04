@@ -3,6 +3,20 @@
   gather_facts: yes
   become: yes
   tasks:
+    - name: update the apt cache
+      apt: >
+        update_cache=yes
+        cache_valid_time=300
+      register: apt_update
+      when: ansible_distribution=='Debian' or ansible_distribution=='Ubuntu'
+
+    - name: upgrade all packages
+      apt: upgrade=dist
+           dpkg_options='force-confold,force-confdef,log=/var/log/apt-upgrade_{{ansible_date_time.date}}-{{ansible_date_time.time}}.log'
+           cache_valid_time=300
+      register: apt_upgrade
+      when: ansible_distribution=='Debian' or ansible_distribution=='Ubuntu'
+
     - name: install build-essential
       apt: name=build-essential state=present
 
