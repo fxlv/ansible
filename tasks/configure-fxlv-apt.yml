@@ -1,0 +1,22 @@
+---
+- hosts: all
+  gather_facts: yes
+  become: yes
+  tasks:
+
+    - name: ping
+      ping:
+
+    - name: add FXLV apt repo (Wheezy)
+      apt_repository:
+        filename: fxlv
+        repo: "deb http://fx.lv/apt/ wheezy/"
+        update_cache: yes
+      when: ansible_distribution_release == 'wheezy'
+
+    - name: add FXLV apt repo (Jessie)
+      apt_repository:
+        filename: fxlv
+        repo: "deb http://fx.lv/apt/ jessie/"
+        update_cache: yes
+      when: ansible_distribution_release == 'jessie'
