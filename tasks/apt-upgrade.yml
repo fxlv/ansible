@@ -15,15 +15,23 @@
       # - debug: var=apt_update.stdout_lines
 
     - name: upgrade all packages
-      apt: upgrade=dist
-           dpkg_options='force-confold,force-confdef,log=/var/log/apt-upgrade_{{ansible_date_time.date}}-{{ansible_date_time.time}}.log'
-           cache_valid_time=300
+      apt:
+        upgrade: dist
+        dpkg_options: "'force-confold,force-confdef,log=\
+          /var/log/apt-upgrade_{{ansible_date_time.date}}-\
+          {{ansible_date_time.time}}.log'"
+        cache_valid_time: 300
       register: apt_upgrade
       when: ansible_distribution=='Debian' or ansible_distribution=='Ubuntu'
       # - debug: var=apt_upgrade.stdout_lines
 
     - name: fetch the apt-get upgrade log file
-      fetch: >
-        src=/var/log/apt-upgrade_{{ansible_date_time.date}}-{{ansible_date_time.time}}.log
-        dest={{log_dir}}/{{ansible_date_time.month}}/{{ansible_date_time.day}}/{{ansible_hostname}}/apt-upgrade-{{ansible_date_time.date}}-{{ansible_date_time.time}}.log flat=yes
+      fetch:
+        src: "/var/log/apt-upgrade_\
+          {{ansible_date_time.date}}-{{ansible_date_time.time}}.log"
+        dest: "{{log_dir}}/{{ansible_date_time.month}}/\
+          {{ansible_date_time.day}}/{{ansible_hostname}}/\
+          apt-upgrade-{{ansible_date_time.date}}-\
+          {{ansible_date_time.time}}.log"
+        flat: yes
       when: ansible_distribution=='Debian' or ansible_distribution=='Ubuntu'
