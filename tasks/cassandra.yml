@@ -21,11 +21,13 @@
 
 
     - name: fetch jre
-      get_url: url=http://fx.lv/jre-8u60-linux-x64.tar.gz
-              dest=/opt/jre
-              sha256sum=49dadecd043152b3b448288a35a4ee6f3845ce6395734bacc1eae340dff3cbf5
-              timeout=30
-              owner=fx
+      get_url:
+        url: http://fx.lv/jre-8u60-linux-x64.tar.gz
+        dest: /opt/jre
+        sha256sum: "49dadecd043152b3b448288a35a4ee6f3845\
+          ce6395734bacc1eae340dff3cbf5"
+        timeout: 30
+        owner: fx
       when: java.stdout != "1.8.0_60"
 
     - name: untar jre
@@ -36,7 +38,8 @@
       when: java.stdout != "1.8.0_60"
       register: jre_unpack
 
-    - shell: 'update-alternatives --install "/usr/bin/java" "java" "/opt/jre/jre1.8.0_60/bin/java" 1'
+    - name: update alternatives for Java
+      shell: 'update-alternatives --install "/usr/bin/java" "java" "/opt/jre/jre1.8.0_60/bin/java" 1'
       register: output
       when: jre_unpack|changed
     - debug: var=output.stdout

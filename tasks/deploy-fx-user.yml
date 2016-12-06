@@ -40,7 +40,9 @@
 
       # On Digitalocean, sudoers.d by default is not honored
     - name: Make sure includes are used for sudoers
-      lineinfile: dest=/usr/local/etc/sudoers line="#includedir /usr/local/etc/sudoers.d"
+      lineinfile:
+        dest: /usr/local/etc/sudoers
+        line: "#includedir /usr/local/etc/sudoers.d"
       when: ansible_distribution=="FreeBSD"
       become: true
 
