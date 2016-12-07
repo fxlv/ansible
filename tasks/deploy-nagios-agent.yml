@@ -15,9 +15,12 @@
     with_items:
     - nagios-plugins
 
-  - group: name=nrpe state=present
-  - user: name=nrpe comment="NRPE" group=nrpe
-  - file: path=/etc/nagios state=directory mode=0755
+  - name: create nrpe group
+    group: name=nrpe state=present
+  - name: create nrpe user
+    user: name=nrpe comment="NRPE" group=nrpe
+  - name: create /etc/nagios directory
+    file: path=/etc/nagios state=directory mode=0755
 
   - name: fetch arm nrpe binary
     get_url: url=http://fx.lv/nrpe/nrpe.arm.gz

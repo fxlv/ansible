@@ -34,7 +34,7 @@
     - name: sudoers FreeBSD
       copy: src=templates/sudoers_fx.j2
             dest=/usr/local/etc/sudoers.d/fx
-            owner=root group=wheel mode=440
+            owner=root group=wheel mode=0440
       become: true
       when: ansible_distribution=="FreeBSD"
 
