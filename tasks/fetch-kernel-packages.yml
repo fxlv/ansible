@@ -1,8 +1,9 @@
 ---
 - hosts: all
-  sudo: yes
+  become: yes
   tasks:
-    - shell: ls -d linux-headers*.deb
+    - name: Determine full name for linux-headers package
+      shell: ls -d linux-headers*.deb
       args:
         chdir: /mnt/resource/build
       register: headers_package
@@ -10,7 +11,8 @@
       fetch: >
         src=/mnt/resource/build/{{headers_package.stdout}}
         dest=/tmp/{{headers_package.stdout}} flat=yes
-    - shell: ls -d linux-image*.deb
+    - name: Determine full name for linux-image package
+      shell: ls -d linux-image*.deb
       args:
         chdir: /mnt/resource/build
       register: linux_image

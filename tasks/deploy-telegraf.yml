@@ -7,9 +7,12 @@
   become: yes
   tasks:
 
-  - group: name=telegraf state=present
-  - user: name=telegraf comment="Telegraf" group=telegraf
-  - file: >
+  - name: create telegraf group
+    group: name=telegraf state=present
+  - name: create telegraf user
+    user: name=telegraf comment="Telegraf" group=telegraf
+  - name: create /opt/telegraf
+    file: >
       path=/opt/telegraf
       state=directory
       mode=0755

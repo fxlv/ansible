@@ -1,13 +1,15 @@
 ---
 - hosts: all
-  sudo: yes
+  become: yes
   tasks:
     - name: collect SAR stats
-      shell: LC_ALL=C sar -o data.sar 2 300 chdir=/root
+      shell: sar -o data.sar 2 300 chdir=/root
+      environment: LC_ALL=C
       async: 510
 
     - name: prep sar file
-      shell: LC_ALL=C sar -A -f data.sar > data.sar.txt chdir=/root
+      shell: sar -A -f data.sar > data.sar.txt chdir=/root
+      environment: LC_ALL=C
 
     - name: fetch sar files
       fetch:
