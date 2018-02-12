@@ -17,11 +17,19 @@
           url: https://packages.microsoft.com/keys/microsoft.asc
           state: present
 
-      - name: add .net apt repository 
+      - name: add .net apt repository (Jessie)
         apt_repository:
           repo: deb https://packages.microsoft.com/repos/microsoft-debian-jessie-prod jessie main
           filename: dotnet
           state: present
+        when: ansible_distribution_release == 'jessie'
+      
+      - name: add .net apt repository (Stretch)
+        apt_repository:
+          repo: deb https://packages.microsoft.com/repos/microsoft-debian-stretch-prod stretch main
+          filename: dotnet
+          state: present
+        when: ansible_distribution_release == 'stretch'
       
       - name: apt-get update 
         apt:
