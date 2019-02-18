@@ -1,1 +1,2 @@
 all filter=git-crypt diff=git-crypt
+group_vars/* filter=git-crypt diff=git-crypt
