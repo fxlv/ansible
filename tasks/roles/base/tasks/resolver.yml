@@ -1,6 +1,6 @@
 ---
   - name: set up resolv conf and hosts file
-    template: src=templates/{{item}}.j2 dest=/etc/{{item}}
+    template: src=templates/{{ item }}.j2 dest=/etc/{{ item }}
               mode=0644 owner=root group=root
     with_items:
       - resolv.conf

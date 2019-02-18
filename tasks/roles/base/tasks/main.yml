@@ -5,4 +5,3 @@
     when: ansible_os_family == "Debian"
   - include: resolver.yml
     when: ansible_os_family == "Debian"
-    
