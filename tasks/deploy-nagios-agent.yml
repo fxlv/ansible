@@ -11,7 +11,7 @@
     when: ansible_distribution=='Debian' or ansible_distribution=='Ubuntu'
 
   - name: install nagios agent and its components
-    apt: name={{item}} state=present
+    apt: name={{ item }} state=present
     with_items:
     - nagios-plugins
 

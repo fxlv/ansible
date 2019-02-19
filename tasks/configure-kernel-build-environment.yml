@@ -14,8 +14,8 @@
       apt:
         upgrade: dist
         dpkg_options: "force-confold,force-confdef,log=\
-          /var/log/apt-upgrade_{{ansible_date_time.date}}\
-          -{{ansible_date_time.time}}.log"
+          /var/log/apt-upgrade_{{ ansible_date_time.date }}\
+          -{{ ansible_date_time.time }}.log"
         cache_valid_time: 300
       register: apt_upgrade
       when: ansible_distribution=='Debian' or ansible_distribution=='Ubuntu'
@@ -25,7 +25,7 @@
 
     #  flex, bison and all others needed to build 'perf'
     - name: install build dependencies
-      apt: name={{item}} state=present
+      apt: name={{ item }} state=present
       with_items:
         - bc
         - vim

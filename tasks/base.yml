@@ -4,5 +4,5 @@
   become: yes
   gather_facts: yes
 
-  roles:  
+  roles:
     - base

@@ -9,8 +9,8 @@
       register: headers_package
     - name: fetch kernel headers
       fetch: >
-        src=/mnt/resource/build/{{headers_package.stdout}}
-        dest=/tmp/{{headers_package.stdout}} flat=yes
+        src=/mnt/resource/build/{{ headers_package.stdout }}
+        dest=/tmp/{{ headers_package.stdout }} flat=yes
     - name: Determine full name for linux-image package
       shell: ls -d linux-image*.deb
       args:
@@ -18,5 +18,5 @@
       register: linux_image
     - name: fetch kernel
       fetch: >
-        src=/mnt/resource/build/{{linux_image.stdout}}
-        dest=/tmp/{{linux_image.stdout}} flat=yes
+        src=/mnt/resource/build/{{ linux_image.stdout }}
+        dest=/tmp/{{ linux_image.stdout }} flat=yes

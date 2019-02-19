@@ -4,7 +4,7 @@
   become: yes
   tasks:
     - name: install dependencies
-      apt: name={{item}} state=present
+      apt: name={{ item }} state=present
       with_items:
         - screen
         - vim
@@ -55,7 +55,7 @@
     - name: add apache cassandra deb repo
       lineinfile: dest=/etc/apt/sources.list line="deb http://www.apache.org/dist/cassandra/debian 21x main"
     - name: install cassandra deps
-      apt: name={{item}}
+      apt: name={{ item }}
       with_items:
         - libxi6
         - libxml2
