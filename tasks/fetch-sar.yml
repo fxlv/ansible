@@ -1,18 +1,31 @@
 ---
 - hosts: all
-  become: yes
   tasks:
+    - name: Install sysstat to ensure that sar commmand is available
+      apt:
+        name: sysstat
+        state: present
+
+    - name: check if and when sar data was last collected
+      stat: 
+        path: /tmp/data.sar
+      register: sar_data_stat
+
     - name: collect SAR stats
-      shell: sar -o data.sar 2 300 chdir=/root
-      environment: LC_ALL=C
-      async: 510
+      command: sar -o /tmp/data.sar 2 150
+      async: 310
+      poll: 5
+      # check when was the stats file last modified and compare to current unix timestamp - 30 seconds
+      # therefore we only collect stats if stats were last collected longer than 30 sec ago
+      when: "ansible_date_time.epoch|int -30 > sar_data_stat.stat.mtime|int"
+      notify: prep sar file
 
+  handlers:
     - name: prep sar file
-      shell: sar -A -f data.sar > data.sar.txt chdir=/root
-      environment: LC_ALL=C
-
+      shell: sar -A -f /tmp/data.sar > /tmp/data.sar.txt
+      notify: fetch sar files
     - name: fetch sar files
       fetch:
-        src: /root/data.sar.txt
-        dest: /tmp/{{ ansible_hostname }}-data.sar.txt
+        src: /tmp/data.sar.txt
+        dest: /tmp/{{ ansible_hostname }}_{{ date }}_{{ hour }}-{{ minute }}-{{ second }}_data.sar.txt
         flat: yes
