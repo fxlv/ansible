@@ -7,7 +7,7 @@
         state: present
 
     - name: check if and when sar data was last collected
-      stat: 
+      stat:
         path: /tmp/data.sar
       register: sar_data_stat
 
@@ -27,5 +27,5 @@
     - name: fetch sar files
       fetch:
         src: /tmp/data.sar.txt
-        dest: /tmp/{{ ansible_hostname }}_{{ date }}_{{ hour }}-{{ minute }}-{{ second }}_data.sar.txt
+        dest: /tmp/{{ ansible_hostname }}_{{ ansible_date_time.date }}_{{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}-{{ ansible_date_time.second }}_data.sar.txt
         flat: yes
