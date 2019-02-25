@@ -13,7 +13,7 @@
   - name: install nagios agent and its components
     apt: name={{ item }} state=present
     with_items:
-    - nagios-plugins
+      - nagios-plugins
 
   - name: create nrpe group
     group: name=nrpe state=present
@@ -78,8 +78,8 @@
           owner=root group=root mode=0644
 
   handlers:
-  - name: tail syslog and grep for nrpe
-    shell: tail /var/log/syslog -n 50 | grep "nrpe\["
-    register: nrpe_syslog
-  - name: print syslog
-    debug: var=nrpe_syslog.stdout_lines
+    - name: tail syslog and grep for nrpe
+      shell: tail /var/log/syslog -n 50 | grep "nrpe\["
+      register: nrpe_syslog
+    - name: print syslog
+      debug: var=nrpe_syslog.stdout_lines

@@ -3,39 +3,39 @@
 # Configure Microsoft .NET repo
 # and install .net runtime
 #
-  - hosts: all
-    gather_facts: yes
-    become: yes
-    tasks:
-      - name: install apt-transport-https
-        apt:
-          name: apt-transport-https
-          state: present
+- hosts: all
+  gather_facts: yes
+  become: yes
+  tasks:
+    - name: install apt-transport-https
+      apt:
+        name: apt-transport-https
+        state: present
 
-      - name: add Microsoft APT key
-        apt_key:
-          url: https://packages.microsoft.com/keys/microsoft.asc
-          state: present
+    - name: add Microsoft APT key
+      apt_key:
+        url: https://packages.microsoft.com/keys/microsoft.asc
+        state: present
 
-      - name: add .net apt repository (Jessie)
-        apt_repository:
-          repo: deb https://packages.microsoft.com/repos/microsoft-debian-jessie-prod jessie main
-          filename: dotnet
-          state: present
-        when: ansible_distribution_release == 'jessie'
+    - name: add .net apt repository (Jessie)
+      apt_repository:
+        repo: deb https://packages.microsoft.com/repos/microsoft-debian-jessie-prod jessie main
+        filename: dotnet
+        state: present
+      when: ansible_distribution_release == 'jessie'
 
-      - name: add .net apt repository (Stretch)
-        apt_repository:
-          repo: deb https://packages.microsoft.com/repos/microsoft-debian-stretch-prod stretch main
-          filename: dotnet
-          state: present
-        when: ansible_distribution_release == 'stretch'
+    - name: add .net apt repository (Stretch)
+      apt_repository:
+        repo: deb https://packages.microsoft.com/repos/microsoft-debian-stretch-prod stretch main
+        filename: dotnet
+        state: present
+      when: ansible_distribution_release == 'stretch'
 
-      - name: apt-get update
-        apt:
-          update_cache: yes
+    - name: apt-get update
+      apt:
+        update_cache: yes
 
-      - name: install .net runtime
-        apt:
-          name: dotnet-runtime-2.0.5
-          state: present
+    - name: install .net runtime
+      apt:
+        name: dotnet-runtime-2.0.5
+        state: present
