@@ -17,9 +17,9 @@
     - name: upgrade all packages
       apt:
         upgrade: dist
-        dpkg_options: "'force-confold,force-confdef,log=\
+        dpkg_options: "force-confold,force-confdef,log=\
           /var/log/apt-upgrade_{{ ansible_date_time.date }}-\
-          {{ ansible_date_time.time }}.log'"
+          {{ ansible_date_time.time }}.log"
         cache_valid_time: 300
       register: apt_upgrade
       when: ansible_distribution=='Debian' or ansible_distribution=='Ubuntu'
