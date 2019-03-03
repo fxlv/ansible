@@ -11,4 +11,5 @@ before_script:
 script:
   - yamllint -c .yamllint.yml tasks/*.yml
   - ansible-lint tasks/*.yml
+  - ansible-lint tasks/roles/base/tasks/*.yml
   - flake8 plugins/callback/logger.py
