@@ -22,7 +22,15 @@
       # take the SSH pub key from OSX
     - name: set up ssh key
       authorized_key: user=fx
-                      key="{{ lookup('file','/Users/fx/.ssh/id_rsa.pub') }}"
+                      key="{{ lookup('file',lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"
+      become: true
+      # take the SSH pub key from OSX
+    - name: set up secondary
+      authorized_key: 
+        user: fx
+        key: '{{ item }}'
+      with_file:
+        - secondayssh.key
       become: true
       # set up sudoers file only for Debian machines
     - name: sudoers Debian
