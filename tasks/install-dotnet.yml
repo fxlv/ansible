@@ -4,8 +4,8 @@
 # and install .net runtime
 #
 - hosts: all
-  gather_facts: yes
-  become: yes
+  gather_facts: true
+  become: true
   tasks:
     - name: install apt-transport-https
       apt:
@@ -33,9 +33,9 @@
 
     - name: apt-get update
       apt:
-        update_cache: yes
+        update_cache: true
 
     - name: install .net runtime
       apt:
-        name: dotnet-runtime-2.0.5
+        name: dotnet-runtime-2.0.9
         state: present
