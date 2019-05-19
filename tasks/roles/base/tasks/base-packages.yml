@@ -4,3 +4,14 @@
     name: lsb-compat
     update_cache: yes
     cache_valid_time: 3600
+- name: Install man pages db
+  apt: 
+    name: man-db
+- name: install various sysadmin utilities
+  apt:
+    name: "{{ packages }}"
+  vars:
+    packages:
+    - dstat 
+    - strace 
+    - tmux
