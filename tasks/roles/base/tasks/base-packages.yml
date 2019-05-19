@@ -1,0 +1,6 @@
+---
+- name: Install LSB compat
+  apt: 
+    name: lsb-compat
+    update_cache: yes
+    cache_valid_time: 3600

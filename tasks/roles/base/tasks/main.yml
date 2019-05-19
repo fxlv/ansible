@@ -1,4 +1,6 @@
 ---
+  - include: base-packages.yml
+    when: ansible_os_family == "Debian"
   - include: motd.yml
     when: ansible_os_family == "Debian"
   - include: locales.yml
