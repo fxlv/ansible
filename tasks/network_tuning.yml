@@ -1,0 +1,14 @@
+---
+- hosts: all
+  become: yes
+  tasks:
+    - name: Install network tools
+      apt:
+        name: "{{ packages }}"
+        update_cache: yes
+        cache_valid_time: 3600
+      vars:
+        packages:
+        - hping3
+        - iperf3
+        - tcpdump
