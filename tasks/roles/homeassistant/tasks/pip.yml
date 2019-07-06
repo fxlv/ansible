@@ -1,0 +1,44 @@
+---
+- name: set python3 as the default
+  alternatives:
+    name: python
+    link: /usr/bin/python
+    path: /usr/bin/python3
+  become: yes
+
+
+- name: Install the Homeassistant itself
+  pip: 
+    name: homeassistant
+    executable: pip3
+  become: true
+
+# this will take a while as the package will be built (10+ mins on RPI2)
+- name: Install pytradfri
+  pip:
+    name: pytradfri[async]
+    executable: pip3
+  become: true
+  async: 1200
+  poll: 30
+
+- name: clone hue sensors repo
+  git:
+    repo: https://github.com/robmarkcole/Hue-sensors-HASS.git
+    dest: /home/ha/git/Hue-sensors-HASS
+  become: true
+
+- name: create custom components directory
+  file:
+    path: /home/ha/.homeassistant/custom_components
+    state: directory
+    owner: ha
+  become: true
+
+- name: symlink hue sensors into the HA custom_components directory
+  file:
+    src: /home/ha/git/Hue-sensors-HASS/custom_components/huesensor
+    dest: /home/ha/.homeassistant/custom_components/huesensor
+    state: link
+  become: true
+

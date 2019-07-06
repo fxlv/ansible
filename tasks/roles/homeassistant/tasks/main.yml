@@ -1,0 +1,6 @@
+---
+  - include: user.yml
+  - include: packages.yml
+  - include: pip.yml
+  - include: config.yml
+    tags: config

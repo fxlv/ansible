@@ -1,0 +1,24 @@
+# Configure a default setup of Home Assistant (frontend, api, etc)
+default_config:
+
+# The 'huesensor' requires a package to be installed in 'custom_components' directory
+sensor:
+  - platform: huesensor
+binary_sensor:
+  - platform: huesensor
+device_tracker:
+  - platform: huesensor
+
+hue:
+  bridges:
+    - host: 10.111.105.102
+      allow_unreachable: true
+
+
+# Text to speech
+tts:
+  - platform: google_translate
+
+group: !include groups.yaml
+automation: !include automations.yaml
+script: !include scripts.yaml

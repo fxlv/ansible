@@ -1,0 +1,28 @@
+---
+hallway_lights:
+  name: Hallway lights
+  view: yes
+  entities:
+    - light.tradfri_light_7e241d52044000b3_65545
+    - light.tradfri_light_7e241d52044000b3_65546
+    - light.tradfri_bulb_gu10_w_400lm_5
+
+living_room_lights:
+  name: Living room lights
+  entities:
+    - light.balls
+    - light.living_room_balls
+    - light.desk
+    - light.stavlampa
+
+living_room_lights_ceiling:
+  name: Living room ceiling lights
+  entities:
+    - light.living_room_1
+    - light.living_room_2
+
+living_room_lights_all:
+  name: Living room lights
+  entities:
+    - group.living_room_lights
+    - group.living_room_lights_ceiling

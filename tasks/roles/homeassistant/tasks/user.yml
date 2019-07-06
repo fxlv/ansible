@@ -1,0 +1,9 @@
+---
+# create user on Debian
+- name: create Debian user
+  user: 
+    name: ha 
+    comment: "Home Assistant" 
+    shell: "/bin/bash"
+  become: true
+  when: ansible_distribution=='Debian'

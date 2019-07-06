@@ -1,0 +1,22 @@
+---
+- name: deploy ha config file 
+  copy:
+    src: configuration.yaml
+    dest: /home/ha/.homeassistant/configuration.yaml
+    owner: ha
+    group: ha
+  become: true
+- name: deploy ha config file 
+  copy:
+    src: automations.yaml
+    dest: /home/ha/.homeassistant/automations.yaml
+    owner: ha
+    group: ha
+  become: true
+- name: deploy ha config file 
+  copy:
+    src: groups.yaml
+    dest: /home/ha/.homeassistant/groups.yaml
+    owner: ha
+    group: ha
+  become: true

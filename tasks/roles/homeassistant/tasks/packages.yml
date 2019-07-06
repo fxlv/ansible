@@ -1,0 +1,18 @@
+---
+- name: Install the depencencies
+  apt: 
+    name: "{{ packages }}"
+    update_cache: yes
+    cache_valid_time: 300
+  vars:
+    packages:
+      - python3 
+      - python3-venv 
+      - python3-pip 
+      - libffi-dev 
+      - libssl-dev
+      - python3-setuptools
+      - git
+      - build-essential
+      - autoconf
+  become: true

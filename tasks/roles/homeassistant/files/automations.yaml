@@ -1,0 +1,194 @@
+# Living room lights on
+- id: '1544978034061'
+  alias: Living room switch ON
+  trigger:
+  - entity_id: sensor.hue_dimmer_switch_1
+    platform: state
+    to: 1_click_up
+  condition: []
+  action:
+    
+    - service: light.turn_on
+      entity_id: light.balls
+    
+    - service: light.turn_on
+      entity_id: light.living_room_balls
+    
+    - service: light.turn_on
+      entity_id: light.desk
+      data: 
+        brightness: 200
+    
+    - service: light.turn_on
+      entity_id: light.stavlampa
+      data: 
+        brightness: 200
+
+# Living room lights off
+- id: '1545593976803'
+  alias: living room switch OFF
+  trigger:
+  - entity_id: sensor.hue_dimmer_switch_1
+    platform: state
+    to: 4_click_up
+  condition: []
+  action:
+    - service: light.turn_off
+      entity_id: group.living_room_lights_all
+
+# Window lights only
+- id: '1545827322660'
+  alias: Window lights ON
+  trigger:
+  - entity_id: sensor.hue_dimmer_switch_1
+    platform: state
+    to: 2_click_up
+  action:
+  - service: light.turn_on
+    data:
+      entity_id: light.balls
+
+# Ceiling lights only
+- id: '1545827568479'
+  alias: Ceiling lights ON
+  trigger:
+  - entity_id: sensor.hue_dimmer_switch_1
+    platform: state
+    to: 3_click_up
+  action:
+  - service: light.turn_on
+    entity_id: light.living_room_1
+  - service: light.turn_on
+    entity_id: light.living_room_2
+
+####################################################
+# WC lights during daytime
+####################################################
+- id: '1546269349037'
+  alias: wc motion during the day
+  trigger:
+  - entity_id: binary_sensor.hallway_sensor_motion
+    platform: state
+    from: 'off'
+    to: 'on'
+  condition: 
+    condition: time
+    after: '06:00:00'
+    before: '18:00:00'
+  action:
+  - service: light.turn_on
+    data:
+      entity_id: light.tradfri_light_7e241d52044000b3_65547
+      brightness: 200
+      transition: 5
+
+
+####################################################
+# WC lights during evening
+####################################################
+
+- id: '1546269349037'
+  alias: wc motion during the evening
+  trigger:
+  - entity_id: binary_sensor.hallway_sensor_motion
+    platform: state
+    from: 'off'
+    to: 'on'
+  condition: 
+    condition: time
+    after: '18:00:00'
+    before: '21:00:00'
+  action:
+  - service: light.turn_on
+    data:
+      entity_id: light.tradfri_light_7e241d52044000b3_65547 
+      brightness: 125
+      transition: 3
+
+####################################################
+# WC lights during night
+####################################################
+
+- id: '1546269349037'
+  alias: wc motion during the night
+  trigger:
+  - entity_id: binary_sensor.hallway_sensor_motion
+    platform: state
+    from: 'off'
+    to: 'on'
+  condition: 
+    condition: time
+    after: '21:00:00'
+    before: '06:00:00'
+  action:
+  - service: light.turn_on
+    data:
+      entity_id: light.tradfri_light_7e241d52044000b3_65547
+      brightness: 20
+
+####################################################
+# WC lights off (any time of the day, same automation)
+####################################################
+
+- id: wc_motion_off_day
+  alias: wc_motion_off_day
+  trigger:
+  - entity_id: binary_sensor.hallway_sensor_motion
+    platform: state
+    from: 'on'
+    to: 'off'
+    for:
+      minutes: 5
+  action:
+  - service: light.turn_off
+    data:
+      entity_id: light.tradfri_light_7e241d52044000b3_65547
+      transition: 10
+
+####################################################
+# Hallway lights
+####################################################
+
+
+- id: 'hallway_motion_day'
+  alias: hallway motion during the day
+  trigger:
+  - entity_id: binary_sensor.hallway_above_kitchen_door_motion
+    platform: state
+    from: 'off'
+    to: 'on'
+  action:
+  # hallway entrance
+  - service: light.turn_on
+    data:
+      entity_id: light.tradfri_light_7e241d52044000b3_65545
+      brightness: 250
+      transition: 1
+  # hallway kitchen
+  - service: light.turn_on
+    data:
+      entity_id: light.tradfri_light_7e241d52044000b3_65546
+      brightness: 250
+      transition: 2
+  # hallway bathroom
+  - service: light.turn_on
+    data:
+      entity_id: light.tradfri_bulb_gu10_w_400lm_5
+      brightness: 250
+      transition: 2
+
+
+- id: 'hallway_motion_off'
+  alias: hallway motion off
+  trigger:
+  - entity_id: binary_sensor.hallway_above_kitchen_door_motion
+    platform: state
+    from: 'on'
+    to: 'off'
+    for:
+      minutes: 1
+  action:
+  - service: light.turn_off
+    data:
+      entity_id: group.hallway_lights
+      transition: 5
