@@ -1,12 +1,26 @@
 ---
+- name: Install aptitude
+  apt: 
+    name: aptitude
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: Disable default RaspberryPi user
+  user:
+    name: pi
+    state: absent
+  when: ansible_machine == "armv7l"
+  
 - name: Install LSB compat
   apt: 
     name: lsb-compat
-    update_cache: yes
-    cache_valid_time: 3600
+   
+  when: ansible_machine == "x86_64"
+
 - name: Install man pages db
   apt: 
     name: man-db
+
 - name: install various sysadmin utilities
   apt:
     name: "{{ packages }}"
