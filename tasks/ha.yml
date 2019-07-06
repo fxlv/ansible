@@ -1,0 +1,7 @@
+---
+- name: Homeassistant role
+  hosts: lighthouse
+  gather_facts: yes
+
+  roles:
+    - homeassistant
