@@ -2,22 +2,53 @@
 default_config:
 
 # The 'huesensor' requires a package to be installed in 'custom_components' directory
+# HA ships with HUE support already, however it does not support swithces/dimmers.
+# therefore I use the 3rd party mainly to have working switch.
+# this does create a small issue that there is some sensor duplication.
+
 sensor:
   - platform: huesensor
+  # unfortunately the developers of HA are not polline the HUE often enough (5sec) for the motion sensors to actually provide decent reaction speed
+  # therefore for motion sensors, I poll them separately via the HUE API
+  # probably a good idea would be to buy some sort of ZigBee dongle, or I wish the Philips HUE would add support for callbacks/hooks. I'm amazed they don't have it already.
+  - platform: rest
+    name: HueDimmer_REST
+    resource: !secret hue_api_dimmer
+    value_template: '{{ value_json.state.buttonevent }}'
+    verify_ssl: false
+    scan_interval: 5
+
+
+  - platform: rest
+    name: WC_motion_REST
+    resource: !secret hue_api_motion_wc
+    value_template: '{{ value_json.state.lastupdated }}'
+    verify_ssl: false
+    scan_interval: 1
+
+  - platform: rest
+    name: Hallway_motion_REST
+    resource: !secret hue_api_motion_hallway
+    value_template: '{{ value_json.state.lastupdated }}'
+    verify_ssl: false
+    scan_interval: 1
+
 binary_sensor:
   - platform: huesensor
 device_tracker:
   - platform: huesensor
 
+
 hue:
   bridges:
-    - host: 10.111.105.102
+    - host: !secret hue_bridge_ip
       allow_unreachable: true
 
 
 # Text to speech
 tts:
   - platform: google_translate
+
 
 group: !include groups.yaml
 automation: !include automations.yaml
