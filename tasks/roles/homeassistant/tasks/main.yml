@@ -2,5 +2,7 @@
   - include: user.yml
   - include: packages.yml
   - include: pip.yml
+  - include: systemd.yml
+    tags: systemd
   - include: config.yml
     tags: config

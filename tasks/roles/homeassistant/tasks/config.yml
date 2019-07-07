@@ -6,17 +6,33 @@
     owner: ha
     group: ha
   become: true
-- name: deploy ha config file 
+
+- name: deploy ha Automations file 
   copy:
     src: automations.yaml
     dest: /home/ha/.homeassistant/automations.yaml
     owner: ha
     group: ha
   become: true
-- name: deploy ha config file 
+
+- name: deploy ha Groups file 
   copy:
     src: groups.yaml
     dest: /home/ha/.homeassistant/groups.yaml
     owner: ha
     group: ha
+  become: true
+
+- name: deploy ha Secrets file 
+  copy:
+    src: secrets.yaml
+    dest: /home/ha/.homeassistant/secrets.yaml
+    owner: ha
+    group: ha
+  become: true
+
+- name: restart the HA service
+  systemd:
+    name: home-assistant@ha.service
+    state: restarted
   become: true
