@@ -1,0 +1,13 @@
+[Unit]
+Description=Home Assistant
+After=network-online.target
+
+[Service]
+Type=simple
+User=%i
+ExecStart=/usr/local/bin/hass
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target

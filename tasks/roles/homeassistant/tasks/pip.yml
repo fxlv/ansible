@@ -41,4 +41,3 @@
     dest: /home/ha/.homeassistant/custom_components/huesensor
     state: link
   become: true
-

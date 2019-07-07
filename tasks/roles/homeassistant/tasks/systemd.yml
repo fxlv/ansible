@@ -1,0 +1,21 @@
+---
+- name: deploy the systemd unit file
+  copy:
+    src: ha_systemd_unit
+    dest: /etc/systemd/system/home-assistant@ha.service
+    owner: root
+    group: root
+  become: true
+  register: unit_deploy
+
+- name: reload systemd
+  systemd: daemon_reload=yes
+  when: unit_deploy.changed
+  become: true
+
+- name: enable the HA service
+  systemd:
+    name: home-assistant@ha.service
+    enabled: yes
+  become: true
+
