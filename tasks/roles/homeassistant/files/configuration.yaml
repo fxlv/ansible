@@ -5,6 +5,11 @@ default_config:
 # HA ships with HUE support already, however it does not support swithces/dimmers.
 # therefore I use the 3rd party mainly to have working switch.
 # this does create a small issue that there is some sensor duplication.
+homekit:
+  pinode: '123-45-678' 
+  filter:
+    include_domains:
+      - light
 
 sensor:
   - platform: huesensor
@@ -33,6 +38,11 @@ sensor:
     verify_ssl: false
     scan_interval: 1
 
+  - platform: template
+    sensors:
+      nighttime:
+        friendly_name: 'Between 23:00 and 07:00 (considering HA time is in UTC)'
+        value_template: '{{now().hour >= 21 or now().hour < 7}}'
 binary_sensor:
   - platform: huesensor
 device_tracker:
