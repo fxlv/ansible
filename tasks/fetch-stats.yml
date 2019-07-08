@@ -16,7 +16,9 @@
       # when: "ansible_date_time.epoch|int -30 > sar_data_stat.stat.mtime|int"
       # notify: prep sar file
     - name: collect tcpdump
-      command: tcpdump -c 10000 -i any -s 100 -w "/tmp/tcpdump_{{ ansible_hostname }}_{{ ansible_date_time.date }}_{{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}.pcap" host {{ destination_server }}
+      command: >
+        tcpdump -c 10000 -i any -s 100 -w
+        "/tmp/tcpdump_{{ ansible_hostname }}_{{ ansible_date_time.date }}_{{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}.pcap" host {{ destination_server }}
       become: yes
       async: 300
       poll: 0
@@ -27,7 +29,9 @@
       # notify: prep sar file
 
     - name: run the iperf test
-      command: iperf3 -t 120 -c {{ destination_server }} --get-server-output --log "/tmp/iperf_{{ ansible_hostname }}_{{ ansible_date_time.date }}_{{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}.log"
+      command: >
+        iperf3 -t 120 -c {{ destination_server }} --get-server-output
+        --log "/tmp/iperf_{{ ansible_hostname }}_{{ ansible_date_time.date }}_{{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}.log"
       become: yes
       async: 300
       poll: 0
