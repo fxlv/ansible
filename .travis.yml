@@ -1,5 +1,4 @@
 ---
-
 language: yaml
 
 os:
@@ -10,6 +9,9 @@ before_script:
   - sudo pip install flake8
 script:
   - yamllint -c .yamllint.yml tasks/*.yml
+  - yamllint -c .yamllint.yml tasks/roles/base/tasks/*.yml
+  - yamllint -c .yamllint.yml tasks/roles/homeassistant/tasks/*.yml
   - ansible-lint tasks/*.yml
   - ansible-lint tasks/roles/base/tasks/*.yml
+  - ansible-lint tasks/roles/homeassistant/tasks/*.yml
   - flake8 plugins/callback/logger.py
