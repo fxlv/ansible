@@ -1,6 +1,6 @@
 ---
 - name: Install aptitude
-  apt: 
+  apt:
     name: aptitude
     update_cache: yes
     cache_valid_time: 3600
@@ -10,15 +10,15 @@
     name: pi
     state: absent
   when: ansible_machine == "armv7l"
-  
+
 - name: Install LSB compat
-  apt: 
+  apt:
     name: lsb-compat
-   
+
   when: ansible_machine == "x86_64"
 
 - name: Install man pages db
-  apt: 
+  apt:
     name: man-db
 
 - name: install various sysadmin utilities
@@ -26,6 +26,6 @@
     name: "{{ packages }}"
   vars:
     packages:
-    - dstat 
-    - strace 
-    - tmux
+      - dstat
+      - strace
+      - tmux

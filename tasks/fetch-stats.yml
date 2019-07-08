@@ -6,9 +6,6 @@
     destination_server: "23.99.226.16"
   tasks:
 
-
-
-
     - name: collect dstat
       command: dstat -lcidmpry -n --net-packets -t --output "/tmp/dstat_{{ ansible_hostname }}_{{ ansible_date_time.date }}_{{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}.csv" 1 160
       async: 300
@@ -16,8 +13,8 @@
       register: dstat
       # check when was the stats file last modified and compare to current unix timestamp - 30 seconds
       # therefore we only collect stats if stats were last collected longer than 30 sec ago
-      #when: "ansible_date_time.epoch|int -30 > sar_data_stat.stat.mtime|int"
-      #notify: prep sar file
+      # when: "ansible_date_time.epoch|int -30 > sar_data_stat.stat.mtime|int"
+      # notify: prep sar file
     - name: collect tcpdump
       command: tcpdump -c 10000 -i any -s 100 -w "/tmp/tcpdump_{{ ansible_hostname }}_{{ ansible_date_time.date }}_{{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}.pcap" host {{ destination_server }}
       become: yes
@@ -26,11 +23,11 @@
       register: tcpdump
       # check when was the stats file last modified and compare to current unix timestamp - 30 seconds
       # therefore we only collect stats if stats were last collected longer than 30 sec ago
-      #when: "ansible_date_time.epoch|int -30 > sar_data_stat.stat.mtime|int"
-      #notify: prep sar file
+      # when: "ansible_date_time.epoch|int -30 > sar_data_stat.stat.mtime|int"
+      # notify: prep sar file
 
     - name: run the iperf test
-      command: iperf3 -t 120 -c {{ destination_server }} --get-server-output --log "/tmp/iperf_{{ ansible_hostname }}_{{ ansible_date_time.date }}_{{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}.log" 
+      command: iperf3 -t 120 -c {{ destination_server }} --get-server-output --log "/tmp/iperf_{{ ansible_hostname }}_{{ ansible_date_time.date }}_{{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}.log"
       become: yes
       async: 300
       poll: 0
@@ -56,7 +53,7 @@
         paths: /tmp
         patterns: "*.csv"
       register: csv_files
-    #- debug:
+    # - debug:
     #   msg: "{{ csv_files.files }}"
 
     - name: find the generated tcpdump files
@@ -70,7 +67,7 @@
         paths: /tmp
         patterns: "*.log"
       register: iperf_files
-   
+
 
     - name: fetch csv files
       fetch:
@@ -85,7 +82,7 @@
         dest: /tmp/{{ test_name }}/
         flat: yes
       with_items: "{{ pcap_files.files }}"
-    
+
 
     - name: fetch iperf log files
       fetch:
@@ -95,20 +92,19 @@
       with_items: "{{ iperf_files.files }}"
 
     - name: delete the dstat csv files on the server
-      file: 
+      file:
         path: "{{ item.path }}"
         state: absent
       with_items: "{{ csv_files.files }}"
     - name: delete the pcap files on the server
-      file: 
+      file:
         path: "{{ item.path }}"
         state: absent
       become: yes
       with_items: "{{ pcap_files.files }}"
     - name: delete the iperf log files on the server
-      file: 
+      file:
         path: "{{ item.path }}"
         state: absent
       become: yes
       with_items: "{{ iperf_files.files }}"
-

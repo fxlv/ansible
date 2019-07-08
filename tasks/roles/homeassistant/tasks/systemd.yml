@@ -18,4 +18,3 @@
     name: home-assistant@ha.service
     enabled: yes
   become: true
-

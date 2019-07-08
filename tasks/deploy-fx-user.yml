@@ -26,7 +26,7 @@
       become: true
       # take the SSH pub key from OSX
     - name: set up secondary
-      authorized_key: 
+      authorized_key:
         user: fx
         key: '{{ item }}'
       with_file:
