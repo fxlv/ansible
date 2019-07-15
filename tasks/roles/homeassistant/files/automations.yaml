@@ -152,7 +152,7 @@
     #to: True 
   action:
   - service: light.turn_on
-    entity_id: light.tradfri_light_7e241d52044000b3_65547
+    entity_id: group.wc
     data_template:
       brightness: >
         {% if states.sensor.nighttime.state == 'True' %}
@@ -179,7 +179,7 @@
   action:
   - service: light.turn_off
     data:
-      entity_id: light.tradfri_light_7e241d52044000b3_65547
+      entity_id: group.wc
       transition: 10
 
 ####################################################

@@ -3,8 +3,8 @@ hallway_lights:
   name: Hallway lights
   view: yes
   entities:
-    - light.tradfri_light_7e241d52044000b3_65545
-    - light.tradfri_light_7e241d52044000b3_65546
+    - light.tradfri_bulb_6
+    - light.tradfri_bulb_7
     - light.tradfri_bulb_gu10_w_400lm_5
 
 living_room_lights:
@@ -26,3 +26,8 @@ living_room_lights_all:
   entities:
     - group.living_room_lights
     - group.living_room_lights_ceiling
+
+wc:
+  name: wc_light
+  entities:
+    - light.tradfri_bulb_8
