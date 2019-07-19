@@ -1,0 +1,23 @@
+---
+- hosts: all
+  gather_facts: no
+  tasks:
+    - name: Gather stats
+      routeros_command:
+        commands: /system resource print
+      register: routeros_resources
+      when: ansible_network_os == 'routeros'
+    
+    - name: Check for updates
+      routeros_command:
+        commands: /system package update check-for-updates
+      register: routeros_updates
+      when: ansible_network_os == 'routeros'
+
+
+    - name: Display stats
+      debug:
+        msg:
+          - "Router OS resources: {{ routeros_resources }}"
+          - "Router OS updates: {{ routeros_updates }}"
+
