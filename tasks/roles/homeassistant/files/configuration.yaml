@@ -42,7 +42,8 @@ sensor:
     sensors:
       nighttime:
         friendly_name: 'Between 23:00 and 07:00 (considering HA time is in UTC)'
-        value_template: '{{now().hour >= 21 or now().hour < 7}}'
+        value_template: '{{now().hour >= 20 or now().hour < 7}}'
+        entity_id: sensor.time
 binary_sensor:
   - platform: huesensor
 device_tracker:
@@ -62,4 +63,3 @@ tts:
 
 group: !include groups.yaml
 automation: !include automations.yaml
-script: !include scripts.yaml

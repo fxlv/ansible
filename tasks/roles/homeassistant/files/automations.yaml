@@ -15,7 +15,7 @@
 - id: '1544978034062'
   alias: Living room switch ON
   trigger:
-  - entity_id: sensor.hue_dimmer_switch_1
+  - entity_id: sensor.hue_dimmer_living_room
     platform: state
     to: 1_click_up
   condition: []
@@ -59,7 +59,7 @@
 - id: '1544978034061'
   alias: Living room switch ON, bright
   trigger:
-  - entity_id: sensor.hue_dimmer_switch_1
+  - entity_id: sensor.hue_dimmer_living_room
     platform: state
     to: 1_hold_up
   condition: []
@@ -86,7 +86,7 @@
 - id: '1545593976803'
   alias: living room switch OFF
   trigger:
-  - entity_id: sensor.hue_dimmer_switch_1
+  - entity_id: sensor.hue_dimmer_living_room
     platform: state
     to: 4_click_up
   condition: []
@@ -94,11 +94,35 @@
     - service: light.turn_off
       entity_id: group.living_room_lights_all
 
+# Bathroom room lights ON
+- id: '1545593976111'
+  alias: Bathroom lights ON
+  trigger:
+  - entity_id: sensor.hue_dimmer_hallway
+    platform: state
+    to: 1_click_up
+  condition: []
+  action:
+    - service: light.turn_on
+      entity_id: group.bathroom
+
+# Bathroom room lights OFF
+- id: '1545593976111'
+  alias: Bathroom lights OFF
+  trigger:
+  - entity_id: sensor.hue_dimmer_hallway
+    platform: state
+    to: 4_click_up
+  condition: []
+  action:
+    - service: light.turn_off
+      entity_id: group.bathroom
+
 # Window lights only
 - id: '1545827322660'
   alias: Window lights ON
   trigger:
-  - entity_id: sensor.hue_dimmer_switch_1
+  - entity_id: sensor.hue_dimmer_living_room
     platform: state
     to: 2_click_up
   action:
@@ -110,7 +134,7 @@
 - id: '1545827568411'
   alias: Ceiling lights ON
   trigger:
-  - entity_id: sensor.hue_dimmer_switch_1
+  - entity_id: sensor.hue_dimmer_living_room
     platform: state
     to: 3_click_up
   action:
@@ -127,7 +151,7 @@
 - id: '1545827568479'
   alias: Ceiling lights ON, bright
   trigger:
-  - entity_id: sensor.hue_dimmer_switch_1
+  - entity_id: sensor.hue_dimmer_living_room
     platform: state
     to: 3_hold_up
   action:
@@ -141,6 +165,89 @@
       brightness_pct: 100
 
 ####################################################
+# Bathroom lights during daytime
+####################################################
+- id: '1546261349037'
+  alias: wc motion during the day
+  trigger:
+  - entity_id: binary_sensor.bathroom_motion_motion
+    platform: state
+    #from: False
+    #to: True 
+  condition:
+    condition: time
+    after: '07:00'
+    before: '23:00'
+  action:
+  - service: light.turn_on
+    entity_id: group.bathroom
+    data_template:
+      brightness_pct: 100
+      transition: 5
+
+####################################################
+# Bathroom lights during evening and night
+####################################################
+- id: '1511269349037'
+  alias: wc motion during the evening/night
+  trigger:
+  - entity_id: binary_sensor.bathroom_motion_motion
+    platform: state
+    #from: False
+    #to: True 
+  condition:
+    condition: time
+    after: '23:00'
+    before: '07:00'
+  action:
+  - service: light.turn_on
+    entity_id: group.bathroom_half
+    data_template:
+      brightness_pct: 20
+      transition: 10
+
+####################################################
+# Bathroom lights off (any time of the day, same automation)
+####################################################
+
+- id: wc_motion_off_day
+  alias: wc_motion_off_day
+  trigger:
+  - entity_id: binary_sensor.bathroom_motion_motion
+    platform: state
+    from: 'on'
+    to: 'off'
+    for:
+      minutes: 2
+  condition:
+    condition: time
+    after: '23:00'
+    before: '07:00'
+  action:
+  - service: light.turn_off
+    data:
+      entity_id: group.bathroom
+      transition: 30
+
+- id: wc_motion_off_night
+  alias: wc_motion_off_day
+  trigger:
+  - entity_id: binary_sensor.bathroom_motion_motion
+    platform: state
+    from: 'on'
+    to: 'off'
+    for:
+      minutes: 10
+  condition:
+    condition: time
+    after: '23:00'
+    before: '07:00'
+  action:
+  - service: light.turn_off
+    data:
+      entity_id: group.bathroom
+      transition: 20
+####################################################
 # WC lights during daytime
 ####################################################
 - id: '1546269349037'
@@ -149,18 +256,37 @@
   - entity_id: sensor.wc_motion_rest
     platform: state
     #from: False
-    #to: True 
+    #to: True
+  condition:
+    condition: time
+    after: '07:30'
+    before: '19:25'
   action:
   - service: light.turn_on
     entity_id: group.wc
     data_template:
-      brightness: >
-        {% if states.sensor.nighttime.state == 'True' %}
-        50
-        {% else %}
-        200
-        {% endif %}   
+      brightness_pct: 100
       transition: 5
+####################################################
+# WC lights during daytime
+####################################################
+- id: '1246269349037'
+  alias: wc motion during the day
+  trigger:
+  - entity_id: sensor.wc_motion_rest
+    platform: state
+    #from: False
+    #to: True
+  condition:
+    condition: time
+    after: '19:25'
+    before: '07:30'
+  action:
+  - service: light.turn_on
+    entity_id: group.wc
+    data_template:
+      brightness_pct: 10
+      transition: 10
 
 
 ####################################################

@@ -15,4 +15,5 @@
       - git
       - build-essential
       - autoconf
+      - libavahi-compat-libdnssd-dev
   become: true

@@ -22,6 +22,12 @@
   async: 1200
   poll: 30
 
+- name: Install HAP-python (needed for Homekit)
+  pip:
+    name: HAP-python
+    executable: pip3
+  become: true
+
 - name: clone hue sensors repo
   git:
     repo: https://github.com/robmarkcole/Hue-sensors-HASS.git
