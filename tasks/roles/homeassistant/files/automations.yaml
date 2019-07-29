@@ -94,29 +94,10 @@
     - service: light.turn_off
       entity_id: group.living_room_lights_all
 
-# Bathroom room lights ON
-- id: '1545593976111'
-  alias: Bathroom lights ON
-  trigger:
-  - entity_id: sensor.hue_dimmer_hallway
-    platform: state
-    to: 1_click_up
-  condition: []
-  action:
-    - service: light.turn_on
-      entity_id: group.bathroom
 
-# Bathroom room lights OFF
-- id: '1545593976111'
-  alias: Bathroom lights OFF
-  trigger:
-  - entity_id: sensor.hue_dimmer_hallway
-    platform: state
-    to: 4_click_up
-  condition: []
-  action:
-    - service: light.turn_off
-      entity_id: group.bathroom
+
+
+
 
 # Window lights only
 - id: '1545827322660'
@@ -168,16 +149,24 @@
 # Bathroom lights during daytime
 ####################################################
 - id: '1546261349037'
-  alias: wc motion during the day
+  alias: bathroom motion during daytime
   trigger:
   - entity_id: binary_sensor.bathroom_motion_motion
     platform: state
+    from: 'off'
+    to: 'on'
     #from: False
     #to: True 
   condition:
-    condition: time
-    after: '07:00'
-    before: '23:00'
+    condition: and
+    conditions:
+      - condition: time
+        after: '07:00'
+        before: '22:30'
+      - condition: state
+        # if bathroom lights are off
+        entity_id: light.tradfri_light_7e241d52044000b3_65549
+        state: 'off'
   action:
   - service: light.turn_on
     entity_id: group.bathroom
@@ -193,12 +182,20 @@
   trigger:
   - entity_id: binary_sensor.bathroom_motion_motion
     platform: state
+    from: 'off'
+    to: 'on'
     #from: False
     #to: True 
   condition:
-    condition: time
-    after: '23:00'
-    before: '07:00'
+    condition: and
+    conditions:
+      - condition: time
+        after: '22:30'
+        before: '07:00'
+      - condition: state
+        # if bathroom lights are off
+        entity_id: light.tradfri_light_7e241d52044000b3_65549
+        state: 'off'
   action:
   - service: light.turn_on
     entity_id: group.bathroom_half
@@ -207,30 +204,36 @@
       transition: 10
 
 ####################################################
-# Bathroom lights off (any time of the day, same automation)
+# Bathroom lights off (night)
 ####################################################
 
-- id: wc_motion_off_day
-  alias: wc_motion_off_day
+- id: 'bathroom_off_day1'
+  alias: bathroom_off_day1
   trigger:
   - entity_id: binary_sensor.bathroom_motion_motion
     platform: state
     from: 'on'
     to: 'off'
     for:
-      minutes: 2
+      minutes: 1
   condition:
-    condition: time
-    after: '23:00'
-    before: '07:00'
+    condition: and
+    conditions:
+      - condition: time
+        after: '23:00'
+        before: '07:00'  
   action:
   - service: light.turn_off
     data:
       entity_id: group.bathroom
       transition: 30
 
-- id: wc_motion_off_night
-  alias: wc_motion_off_day
+
+####################################################
+# Bathroom lights off (day)
+####################################################
+- id: 'bathroom_off_night1'
+  alias: bathroom_off_night1
   trigger:
   - entity_id: binary_sensor.bathroom_motion_motion
     platform: state
@@ -240,13 +243,53 @@
       minutes: 10
   condition:
     condition: time
-    after: '23:00'
-    before: '07:00'
+    after: '07:00'
+    before: '23:00'
   action:
   - service: light.turn_off
     data:
       entity_id: group.bathroom
       transition: 20
+
+
+####################################################
+# Hallway dimmer 
+####################################################
+
+# Bathroom room lights ON
+- id: '1545593976111'
+  alias: Bathroom lights ON
+  trigger:
+  - entity_id: sensor.hue_dimmer_hallway
+    platform: state
+    to: 1_click_up
+  action:
+    - service: light.turn_on
+      entity_id: group.bathroom
+      data: 
+        brightness_pct: 100
+        transition: 2
+
+# Bathroom room lights OFF
+- id: '1545593976111'
+  alias: Bathroom lights OFF
+  trigger:
+  - entity_id: sensor.hue_dimmer_hallway
+    platform: state
+    to: 4_click_up
+  condition: []
+  action:
+    - service: light.turn_off
+      entity_id: group.bathroom
+
+####################################################
+# Hallway dimmer ends here
+####################################################
+
+
+
+
+
 ####################################################
 # WC lights during daytime
 ####################################################
@@ -268,7 +311,7 @@
       brightness_pct: 100
       transition: 5
 ####################################################
-# WC lights during daytime
+# WC lights during evening
 ####################################################
 - id: '1246269349037'
   alias: wc motion during the day
@@ -313,25 +356,58 @@
 ####################################################
 
 
+#£- id: 'hallway_motion_day'
+#  alias: hallway motion during the day
+#  trigger:
+#  - entity_id: sensor.hallway_motion_rest
+#    platform: state
+#    #from: 'off'
+#    #to: 'on'
+#  action:
+#  - service: light.turn_on
+#  # hallway entrance
+#    entity_id: group.hallway_lights
+#    data_template:
+#      brightness: >
+#        {% if states.sensor.nighttime.state == 'True' %}
+#        50
+#        {% else %}
+#        200
+#        {% endif %}   
+#      transition: 5
+
+
 - id: 'hallway_motion_day'
   alias: hallway motion during the day
   trigger:
   - entity_id: sensor.hallway_motion_rest
     platform: state
-    #from: 'off'
-    #to: 'on'
+  condition:
+    condition: time
+    after: '07:00'
+    before: '22:00'
   action:
-  # hallway entrance
   - service: light.turn_on
     entity_id: group.hallway_lights
     data_template:
-      brightness: >
-        {% if states.sensor.nighttime.state == 'True' %}
-        50
-        {% else %}
-        200
-        {% endif %}   
-      transition: 5
+      brightness_pct: 100
+      transition: 10
+
+- id: 'hallway_motion_night'
+  alias: hallway motion during the day
+  trigger:
+  - entity_id: sensor.hallway_motion_rest
+    platform: state
+  condition:
+    condition: time
+    after: '22:00'
+    before: '07:00'
+  action:
+  - service: light.turn_on
+    entity_id: group.hallway_lights
+    data_template:
+      brightness_pct: 30
+      transition: 10
 
 
 
