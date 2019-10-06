@@ -11,6 +11,7 @@ homekit:
     include_domains:
       - light
 
+
 sensor:
   - platform: huesensor
   # unfortunately the developers of HA are not polline the HUE often enough (5sec) for the motion sensors to actually provide decent reaction speed
