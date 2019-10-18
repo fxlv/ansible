@@ -25,26 +25,6 @@ sensor:
     scan_interval: 5
 
 
-  - platform: rest
-    name: WC_motion_REST
-    resource: !secret hue_api_motion_wc
-    value_template: '{{ value_json.state.lastupdated }}'
-    verify_ssl: false
-    scan_interval: 1
-
-  - platform: rest
-    name: Hallway_motion_REST
-    resource: !secret hue_api_motion_hallway
-    value_template: '{{ value_json.state.lastupdated }}'
-    verify_ssl: false
-    scan_interval: 1
-
-  - platform: template
-    sensors:
-      nighttime:
-        friendly_name: 'Between 23:00 and 07:00 (considering HA time is in UTC)'
-        value_template: '{{now().hour >= 20 or now().hour < 7}}'
-        entity_id: sensor.time
 binary_sensor:
   - platform: huesensor
 device_tracker:
