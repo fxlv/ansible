@@ -151,7 +151,7 @@
 - id: '1546261349037'
   alias: bathroom motion during daytime
   trigger:
-  - entity_id: binary_sensor.bathroom_motion_motion
+  - entity_id: binary_sensor.0x0017880102126284_occupancy
     platform: state
     from: 'off'
     to: 'on'
@@ -180,7 +180,7 @@
 - id: '1511269349037'
   alias: wc motion during the evening/night
   trigger:
-  - entity_id: binary_sensor.bathroom_motion_motion
+  - entity_id: binary_sensor.0x0017880102126284_occupancy
     platform: state
     from: 'off'
     to: 'on'
@@ -210,7 +210,7 @@
 - id: 'bathroom_off_day1'
   alias: bathroom_off_day1
   trigger:
-  - entity_id: binary_sensor.bathroom_motion_motion
+  - entity_id: binary_sensor.0x0017880102126284_occupancy
     platform: state
     from: 'on'
     to: 'off'
@@ -235,7 +235,7 @@
 - id: 'bathroom_off_night1'
   alias: bathroom_off_night1
   trigger:
-  - entity_id: binary_sensor.bathroom_motion_motion
+  - entity_id: binary_sensor.0x0017880102126284_occupancy
     platform: state
     from: 'on'
     to: 'off'
@@ -296,7 +296,7 @@
 - id: '1546269349037'
   alias: wc motion during the day
   trigger:
-  - entity_id: sensor.wc_motion_rest
+  - entity_id: binary_sensor.0x0017880106f45100_occupancy
     platform: state
     #from: False
     #to: True
@@ -316,7 +316,7 @@
 - id: '1246269349037'
   alias: wc motion during the day
   trigger:
-  - entity_id: sensor.wc_motion_rest
+  - entity_id: binary_sensor.0x0017880106f45100_occupancy
     platform: state
     #from: False
     #to: True
@@ -339,7 +339,7 @@
 - id: wc_motion_off_day
   alias: wc_motion_off_day
   trigger:
-  - entity_id: binary_sensor.hallway_sensor_motion
+  - entity_id: binary_sensor.0x0017880106f45100_occupancy
     platform: state
     from: 'on'
     to: 'off'
@@ -380,7 +380,7 @@
 - id: 'hallway_motion_day'
   alias: hallway motion during the day
   trigger:
-  - entity_id: sensor.hallway_motion_rest
+  - entity_id: binary_sensor.0x0017880106f48f41_occupancy
     platform: state
   condition:
     condition: time
@@ -396,7 +396,7 @@
 - id: 'hallway_motion_night'
   alias: hallway motion during the day
   trigger:
-  - entity_id: sensor.hallway_motion_rest
+  - entity_id: binary_sensor.0x0017880106f48f41_occupancy
     platform: state
   condition:
     condition: time
@@ -414,7 +414,7 @@
 - id: 'hallway_motion_off'
   alias: hallway motion off
   trigger:
-  - entity_id: binary_sensor.hallway_above_kitchen_motion_door
+  - entity_id: binary_sensor.0x0017880106f48f41_occupancy
     platform: state
     from: 'on'
     to: 'off'
