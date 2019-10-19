@@ -17,12 +17,23 @@ sensor:
   # unfortunately the developers of HA are not polline the HUE often enough (5sec) for the motion sensors to actually provide decent reaction speed
   # therefore for motion sensors, I poll them separately via the HUE API
   # probably a good idea would be to buy some sort of ZigBee dongle, or I wish the Philips HUE would add support for callbacks/hooks. I'm amazed they don't have it already.
-  - platform: rest
-    name: HueDimmer_REST
-    resource: !secret hue_api_dimmer
-    value_template: '{{ value_json.state.buttonevent }}'
-    verify_ssl: false
-    scan_interval: 5
+  #- platform: rest
+  #  name: HueDimmer_REST
+  #  resource: !secret hue_api_dimmer
+  #  value_template: '{{ value_json.state.buttonevent }}'
+  #  verify_ssl: false
+  #  scan_interval: 5
+  #
+
+
+# configure the state of allowing joining for zigbee devices
+switch:
+  - platform: mqtt
+    name: "Allow Zigbee devices to join"
+    state_topic: "zigbee2mqtt/bridge/config/permit_join"
+    command_topic: "zigbee2mqtt/bridge/config/permit_join"
+    payload_on: "true"
+    payload_off: "false"
 
 
 binary_sensor:

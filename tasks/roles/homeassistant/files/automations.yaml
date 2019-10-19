@@ -298,6 +298,8 @@
   trigger:
   - entity_id: binary_sensor.0x0017880106f45100_occupancy
     platform: state
+    from: 'off'
+    to: 'on'
     #from: False
     #to: True
   condition:
@@ -314,10 +316,12 @@
 # WC lights during evening
 ####################################################
 - id: '1246269349037'
-  alias: wc motion during the day
+  alias: wc motion during the evening
   trigger:
   - entity_id: binary_sensor.0x0017880106f45100_occupancy
     platform: state
+    from: 'off'
+    to: 'on'
     #from: False
     #to: True
   condition:
@@ -356,32 +360,13 @@
 ####################################################
 
 
-#£- id: 'hallway_motion_day'
-#  alias: hallway motion during the day
-#  trigger:
-#  - entity_id: sensor.hallway_motion_rest
-#    platform: state
-#    #from: 'off'
-#    #to: 'on'
-#  action:
-#  - service: light.turn_on
-#  # hallway entrance
-#    entity_id: group.hallway_lights
-#    data_template:
-#      brightness: >
-#        {% if states.sensor.nighttime.state == 'True' %}
-#        50
-#        {% else %}
-#        200
-#        {% endif %}   
-#      transition: 5
-
-
 - id: 'hallway_motion_day'
   alias: hallway motion during the day
   trigger:
   - entity_id: binary_sensor.0x0017880106f48f41_occupancy
     platform: state
+    from: 'off'
+    to: 'on'
   condition:
     condition: time
     after: '07:00'
@@ -398,6 +383,8 @@
   trigger:
   - entity_id: binary_sensor.0x0017880106f48f41_occupancy
     platform: state
+    from: 'off'
+    to: 'on'
   condition:
     condition: time
     after: '22:00'
@@ -425,3 +412,7 @@
     data:
       entity_id: group.hallway_lights
       transition: 10
+
+####################################################
+# END Hallway lights
+####################################################
