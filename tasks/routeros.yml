@@ -7,7 +7,7 @@
         commands: /system resource print
       register: routeros_resources
       when: ansible_network_os == 'routeros'
-    
+
     - name: Check for updates
       routeros_command:
         commands: /system package update check-for-updates
@@ -20,4 +20,3 @@
         msg:
           - "Router OS resources: {{ routeros_resources }}"
           - "Router OS updates: {{ routeros_updates }}"
-

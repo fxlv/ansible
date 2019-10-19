@@ -32,6 +32,7 @@
   git:
     repo: https://github.com/robmarkcole/Hue-sensors-HASS.git
     dest: /home/ha/git/Hue-sensors-HASS
+    version: v1.7
   become: true
 
 - name: create custom components directory
