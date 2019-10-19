@@ -1,0 +1,19 @@
+homeassistant: true
+permit_join: false
+mqtt:
+  base_topic: zigbee2mqtt
+  server: 'mqtt://localhost'
+serial:
+  port: /dev/ttyUSB0
+advanced:
+  rtscts: false
+devices:
+  '0x0017880106f45100':
+    friendly_name: '0x0017880106f45100'
+    retain: false
+  '0x0017880102126284':
+    friendly_name: '0x0017880102126284'
+    retain: false
+  '0x0017880106f48f41':
+    friendly_name: '0x0017880106f48f41'
+    retain: false

@@ -1,20 +1,35 @@
 ---
-- name: deploy the systemd unit file
+- name: deploy the systemd unit file for HomeAssistant
   copy:
     src: ha_systemd_unit
     dest: /etc/systemd/system/home-assistant@ha.service
     owner: root
     group: root
   become: true
-  register: unit_deploy
+  register: unit_deploy_ha
+
+- name: deploy the systemd unit file for zigbee2mqtt
+  copy:
+    src: zigbee2mqtt_systemd_unit
+    dest: /etc/systemd/system/zigbee2mqtt.service
+    owner: root
+    group: root
+  become: true
+  register: unit_deploy_zigbee
 
 - name: reload systemd
   systemd: daemon_reload=yes
-  when: unit_deploy.changed
+  when: ( unit_deploy_ha.changed ) or ( unit_deploy_zigbee.changed )
   become: true
 
 - name: enable the HA service
   systemd:
     name: home-assistant@ha.service
+    enabled: yes
+  become: true
+
+- name: enable the zigbee2mqtt service
+  systemd:
+    name: zigbee2mqtt.service
     enabled: yes
   become: true

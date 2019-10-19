@@ -16,4 +16,5 @@
       - build-essential
       - autoconf
       - libavahi-compat-libdnssd-dev
+      - mosquitto
   become: true

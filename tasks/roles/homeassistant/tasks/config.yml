@@ -36,3 +36,11 @@
     name: home-assistant@ha.service
     state: restarted
   become: true
+
+- name: deploy zigbee2mqtt config file
+  copy:
+    src: zigbee2mqtt.config.yaml
+    dest: /opt/zigbee2mqtt/data/configuration.yaml
+    owner: ha
+    group: ha
+  become: true
