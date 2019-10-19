@@ -44,3 +44,9 @@
     owner: ha
     group: ha
   become: true
+
+- name: restart the zigbee2mqtt service
+  systemd:
+    name: zigbee2mqtt.service
+    state: restarted
+  become: true

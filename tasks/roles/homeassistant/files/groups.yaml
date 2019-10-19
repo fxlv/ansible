@@ -11,6 +11,12 @@ hallway_lights_one:
   entities:
     - light.tradfri_bulb_6
 
+bedroom_lights:
+  name: Bedroom lights
+  entities:
+    - light.0x90fd9ffffe0fe782_light
+    - light.0x000b3cfffeff1419_light
+
 living_room_lights:
   name: Living room lights
   entities:

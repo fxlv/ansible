@@ -9,11 +9,23 @@ advanced:
   rtscts: false
 devices:
   '0x0017880106f45100':
-    friendly_name: '0x0017880106f45100'
+    friendly_name: 'wc_motion'
     retain: false
   '0x0017880102126284':
-    friendly_name: '0x0017880102126284'
+    friendly_name: 'bathroom_motion'
     retain: false
   '0x0017880106f48f41':
-    friendly_name: '0x0017880106f48f41'
+    friendly_name: 'hallway_motion'
+    retain: false
+  '0xd0cf5efffef95972':
+    friendly_name: 'bedroom_remote'
+    retain: false
+  '0x0017880106707e9f':
+    friendly_name: 'hallway_switch'
+    retain: false
+  '0x90fd9ffffe0fe782':
+    friendly_name: 'bedroom_light_1'
+    retain: false
+  '0x000b3cfffeff1419':
+    friendly_name: 'bedroom_light_2'
     retain: false

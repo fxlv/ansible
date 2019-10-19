@@ -260,9 +260,9 @@
 - id: '1545593976111'
   alias: Bathroom lights ON
   trigger:
-  - entity_id: sensor.hue_dimmer_hallway
+  - entity_id: sensor.0x0017880106707e9f_action
     platform: state
-    to: 1_click_up
+    to: on-press
   action:
     - service: light.turn_on
       entity_id: group.bathroom
@@ -274,9 +274,9 @@
 - id: '1545593976111'
   alias: Bathroom lights OFF
   trigger:
-  - entity_id: sensor.hue_dimmer_hallway
+  - entity_id: sensor.0x0017880106707e9f_action
     platform: state
-    to: 4_click_up
+    to: off-press
   condition: []
   action:
     - service: light.turn_off
@@ -286,7 +286,69 @@
 # Hallway dimmer ends here
 ####################################################
 
+####################################################
+# Bedroom dimmer , IKEA
+####################################################
 
+# Bedroom room lights toggle
+- id: '1545593976130'
+  alias: Bedroom lights toggle
+  trigger:
+  - entity_id: sensor.0xd0cf5efffef95972_action
+    platform: state
+    to: toggle
+  action:
+    - service: light.toggle
+      entity_id: group.bedroom_lights
+      data: 
+        brightness_pct: 100
+        transition: 2
+
+# Kill all the lights
+- id: '1545593976130'
+  alias: Bedroom lights kill em all
+  trigger:
+  - entity_id: sensor.0xd0cf5efffef95972_action
+    platform: state
+    to: toggle_hold
+  action:
+    - service: light.turn_off
+      data:
+        transition: 10
+
+
+# Bedroom room brightness up
+- id: '1545593976120'
+  alias: Bedroom lights brightness up
+  trigger:
+  - entity_id: sensor.0xd0cf5efffef95972_action
+    platform: state
+    to: brightness_up_click
+  condition: []
+  action:
+    - service: light.turn_on
+      entity_id: group.bedroom_lights
+      data_template: 
+        brightness_pct: 100          
+        transition: 5
+
+# Bedroom room brightness down
+- id: '1545593976120'
+  alias: Bedroom lights brightness down
+  trigger:
+  - entity_id: sensor.0xd0cf5efffef95972_action
+    platform: state
+    to: brightness_down_click
+  condition: []
+  action:
+    - service: light.turn_on
+      entity_id: group.bedroom_lights
+      data_template: 
+        brightness_pct: 50          
+        transition: 5
+####################################################
+# Bedroom dimmer ends here
+####################################################
 
 
 
