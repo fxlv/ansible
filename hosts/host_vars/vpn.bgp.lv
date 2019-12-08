@@ -1,0 +1,5 @@
+---
+ext_ip: 82.196.2.169
+vpn_port: 1194
+vpn_cert: vpn.bgp.lv.crt
+vpn_key: vpn.bgp.lv.key
