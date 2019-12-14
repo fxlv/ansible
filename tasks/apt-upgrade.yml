@@ -1,5 +1,4 @@
 ---
-
 - hosts: all
   gather_facts: yes
   become: yes
@@ -34,4 +33,4 @@
           apt-upgrade-{{ ansible_date_time.date }}-\
           {{ ansible_date_time.time }}.log"
         flat: yes
-      when: ansible_distribution=='Debian' or ansible_distribution=='Ubuntu'
+      when: ( ansible_distribution=='Debian' or ansible_distribution=='Ubuntu' ) and apt_upgrade.changed
