@@ -1,0 +1,31 @@
+---
+- hosts: all
+  gather_facts: no
+  tasks:
+    
+    - name: Check if updates are available
+      routeros_command:
+        commands: /system package update check-for-updates without-paging
+      register: routeros_updates
+      when: ansible_network_os == 'routeros'
+      changed_when: '"status: New version is available" in routeros_updates.stdout[0]'
+
+    - name: Create backup
+      routeros_command:
+        commands: /system backup save
+      register: backup
+      changed_when: '"Configuration backup saved" in backup.stdout[0]'
+      when: routeros_updates.changed
+    
+    - name: Install the update
+      routeros_command:
+        commands: /system package update install without-paging
+      register: routeros_update_install
+      when: ( ansible_network_os == 'routeros' ) and ( routeros_updates.changed )
+      changed_when: '"Downloaded, rebooting..." in routeros_update_install.stdout[0]'
+
+    - name: Debug
+      debug:
+        msg:
+          - "Install status: {{ routeros_update_install }}"
+      when: routeros_updates.changed
