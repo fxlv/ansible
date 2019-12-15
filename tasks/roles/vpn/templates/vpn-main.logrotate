@@ -1,0 +1,32 @@
+{{ vpn_log_file }} {
+       daily
+       rotate {{ vpn_log_retention_days }}
+       compress
+       notifempty
+       missingok
+       postrotate
+              systemctl restart openvpn@openvpn-main.service
+       endscript
+}
+
+{{ vpn_log_file_access }} {
+       daily
+       rotate {{ vpn_log_retention_days }}
+       compress
+       notifempty
+       missingok
+       postrotate
+              systemctl restart openvpn@openvpn-access.service
+       endscript
+}
+
+{{ vpn_log_file_bgpnet }} {
+       daily
+       rotate {{ vpn_log_retention_days }}
+       compress
+       notifempty
+       missingok
+       postrotate
+              systemctl restart openvpn@openvpn-bgpnet.service
+       endscript
+}
