@@ -1,2 +1,4 @@
 all filter=git-crypt diff=git-crypt
 openvpn-main.conf filter=git-crypt diff=git-crypt
+openvpn-access.conf filter=git-crypt diff=git-crypt
+openvpn-bgpnet.conf filter=git-crypt diff=git-crypt
