@@ -1,0 +1,10 @@
+{{ zabbix_agent_log_directory }}/{{ zabbix_agent_log }} {
+       daily
+       rotate {{ zabbix_agent_log_retention_days }}
+       compress
+       notifempty
+       missingok
+       postrotate
+              systemctl restart zabbix-agent
+       endscript
+}

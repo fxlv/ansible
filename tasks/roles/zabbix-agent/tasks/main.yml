@@ -1,0 +1,48 @@
+---
+
+- name: check if zabbix repo file already exists
+  stat:
+    path: /etc/apt/sources.list.d/zabbix.list
+  register: zabbix_repo_source
+
+- name: set up zabbix repo (rpi)
+  apt:
+    deb: https://repo.zabbix.com/zabbix/4.4/raspbian/pool/main/z/zabbix-release/zabbix-release_4.4-1+buster_all.deb
+  when: (ansible_machine == "armv7l") and (zabbix_repo_source.stat.exists == False)
+
+- name: set up zabbix repo (x86)
+  apt:
+    deb: https://repo.zabbix.com/zabbix/4.4/debian/pool/main/z/zabbix-release/zabbix-release_4.4-1+buster_all.deb
+  when: (ansible_architecture == "x86_64") and (zabbix_repo_source.stat.exists == False)
+  
+- name: install zabbix agent
+  apt:
+    name: zabbix-agent
+    state: latest
+
+- name: create zabbix log directory
+  file:
+    path: '{{ zabbix_agent_log_directory }}'
+    state: directory
+    mode: 0755
+    owner: zabbix 
+    group: zabbix
+
+- name: set up zabbix agent config
+  template: 
+    src: templates/zabbix_agentd.conf
+    dest: /etc/zabbix/zabbix_agentd.conf
+    mode: 0644 
+    owner: root 
+    group: root
+  register: zabbix_conf
+
+- name: restart zabbix_agent
+  systemd:
+    name: zabbix-agent
+    enabled: yes
+    state: restarted
+  when: zabbix_conf.changed
+
+- name: set up logrotate rule for zabbix-agent
+  template: src=templates/zabbix-agent.logrotate dest=/etc/logrotate.d/zabbix-agent mode=0644 owner=root group=root
