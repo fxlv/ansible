@@ -2,7 +2,7 @@
 - hosts: all
   gather_facts: no
   tasks:
-    
+
     - name: Check if updates are available
       routeros_command:
         commands: /system package update check-for-updates without-paging
@@ -16,7 +16,7 @@
       register: backup
       changed_when: '"Configuration backup saved" in backup.stdout[0]'
       when: routeros_updates.changed
-    
+
     - name: Install the update
       routeros_command:
         commands: /system package update install without-paging

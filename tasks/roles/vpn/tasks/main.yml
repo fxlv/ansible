@@ -3,29 +3,29 @@
   template: src=templates/vpn-main.logrotate dest=/etc/logrotate.d/vpn-main mode=0644 owner=root group=root
 
 - name: set up main vpn config
-  template: 
-    src=templates/openvpn-main.conf 
-    dest=/etc/openvpn/openvpn-main.conf 
-    mode=0644 
-    owner=root 
+  template:
+    src=templates/openvpn-main.conf
+    dest=/etc/openvpn/openvpn-main.conf
+    mode=0644
+    owner=root
     group=root
   register: main_vpn
 
-- name: set up access vpn config
-  template: 
-    src=templates/openvpn-access.conf 
-    dest=/etc/openvpn/openvpn-access.conf 
-    mode=0644 
-    owner=root 
+- name: set up access vpn
+  template:
+    src=templates/openvpn-access.conf
+    dest=/etc/openvpn/openvpn-access.conf
+    mode=0644
+    owner=root
     group=root
   register: access_vpn
 
 - name: set up bgpnet vpn config
-  template: 
-    src=templates/openvpn-bgpnet.conf 
-    dest=/etc/openvpn/openvpn-bgpnet.conf 
-    mode=0644 
-    owner=root 
+  template:
+    src=templates/openvpn-bgpnet.conf
+    dest=/etc/openvpn/openvpn-bgpnet.conf
+    mode=0644
+    owner=root
     group=root
   register: bgpnet_vpn
 
