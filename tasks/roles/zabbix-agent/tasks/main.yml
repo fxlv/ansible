@@ -8,13 +8,13 @@
 - name: set up zabbix repo (rpi)
   apt:
     deb: https://repo.zabbix.com/zabbix/4.4/raspbian/pool/main/z/zabbix-release/zabbix-release_4.4-1+buster_all.deb
-  when: (ansible_machine == "armv7l") and (zabbix_repo_source.stat.exists == False)
+  when: (ansible_machine == "armv7l") and (not zabbix_repo_source.stat.exists)
 
 - name: set up zabbix repo (x86)
   apt:
     deb: https://repo.zabbix.com/zabbix/4.4/debian/pool/main/z/zabbix-release/zabbix-release_4.4-1+buster_all.deb
-  when: (ansible_architecture == "x86_64") and (zabbix_repo_source.stat.exists == False)
-  
+  when: (ansible_architecture == "x86_64") and (not zabbix_repo_source.stat.exists)
+
 - name: install zabbix agent
   apt:
     name: zabbix-agent
@@ -25,15 +25,15 @@
     path: '{{ zabbix_agent_log_directory }}'
     state: directory
     mode: 0755
-    owner: zabbix 
+    owner: zabbix
     group: zabbix
 
 - name: set up zabbix agent config
-  template: 
+  template:
     src: templates/zabbix_agentd.conf
     dest: /etc/zabbix/zabbix_agentd.conf
-    mode: 0644 
-    owner: root 
+    mode: 0644
+    owner: root
     group: root
   register: zabbix_conf
 
