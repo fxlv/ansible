@@ -1,0 +1,56 @@
+---
+- name: set up logrotate rule for vpn
+  template: src=templates/vpn-main.logrotate dest=/etc/logrotate.d/vpn-main mode=0644 owner=root group=root
+
+- name: set up main vpn config
+  template: 
+    src=templates/openvpn-main.conf 
+    dest=/etc/openvpn/openvpn-main.conf 
+    mode=0644 
+    owner=root 
+    group=root
+  register: main_vpn
+
+- name: set up access vpn config
+  template: 
+    src=templates/openvpn-access.conf 
+    dest=/etc/openvpn/openvpn-access.conf 
+    mode=0644 
+    owner=root 
+    group=root
+  register: access_vpn
+
+- name: set up bgpnet vpn config
+  template: 
+    src=templates/openvpn-bgpnet.conf 
+    dest=/etc/openvpn/openvpn-bgpnet.conf 
+    mode=0644 
+    owner=root 
+    group=root
+  register: bgpnet_vpn
+
+- name: restart main vpn server
+  systemd:
+    name: openvpn@openvpn-main.service
+    enabled: yes
+    state: restarted
+  become: true
+  when: main_vpn.changed
+
+
+- name: restart access vpn server
+  systemd:
+    name: openvpn@openvpn-access.service
+    enabled: yes
+    state: restarted
+  become: true
+  when: access_vpn.changed
+
+
+- name: restart bgpnet vpn server
+  systemd:
+    name: openvpn@openvpn-bgpnet.service
+    enabled: yes
+    state: restarted
+  become: true
+  when: bgpnet_vpn.changed
