@@ -22,8 +22,11 @@
         cache_valid_time: 300
       register: apt_upgrade
       when: ansible_distribution=='Debian' or ansible_distribution=='Ubuntu'
+      notify:
+        - fetch the apt-get upgrade log file
       # - debug: var=apt_upgrade.stdout_lines
 
+  handlers:
     - name: fetch the apt-get upgrade log file
       fetch:
         src: "/var/log/apt-upgrade_\
