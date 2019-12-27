@@ -1,0 +1,7 @@
+---
+- name: Disable swap file usage on RaspberryPi
+  systemd:
+    name: dphys-swapfile.service
+    enabled: no
+  when: ansible_machine == "armv7l"
+
