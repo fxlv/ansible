@@ -40,7 +40,7 @@ living_room_lights_all:
 wc:
   name: wc_light
   entities:
-    - light.tradfri_bulb_8
+    - light.0x90fd9ffffe0fe8a4_light
 
 bathroom:
   name: bathroom_light
