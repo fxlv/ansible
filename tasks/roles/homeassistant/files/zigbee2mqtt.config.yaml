@@ -29,3 +29,19 @@ devices:
   '0x000b3cfffeff1419':
     friendly_name: 'bedroom_light_2'
     retain: false
+  '0x90fd9ffffe14568c':
+    friendly_name: 'hallway_bathroom'
+  '0x90fd9ffffe0fe8a4':
+    friendly_name: 'wc_light_1'
+  '0x000b57fffed796a2':
+    friendly_name: 'bathroom_1'
+  '0x000b3cfffef28412':
+    friendly_name: 'bathroom_4'
+  '0x000b3cfffef4fa58':
+    friendly_name: 'bathroom_2'
+  '0x000b3cfffef27bb4':
+    friendly_name: 'bathroom_3'
+  '0x000b3cfffef6bd43':
+    friendly_name: 'hallway_kitchen'
+  '0x90fd9ffffe10a45e':
+    friendly_name: 'hallway_entrance'

@@ -2,14 +2,14 @@
 hallway_lights:
   name: Hallway lights
   entities:
-    - light.tradfri_bulb_7
-    - light.tradfri_bulb_gu10_w_400lm_5
-    - light.tradfri_bulb_6
+    - light.0x90fd9ffffe10a45e_light
+    - light.0x000b3cfffef6bd43_light
+    - light.0x90fd9ffffe14568c_light
 
 hallway_lights_one:
-  name: Hallway lights
+  name: Hallway lights (one)
   entities:
-    - light.tradfri_bulb_6
+    - light.0x000b3cfffef6bd43_light
 
 bedroom_lights:
   name: Bedroom lights
@@ -43,15 +43,15 @@ wc:
     - light.0x90fd9ffffe0fe8a4_light
 
 bathroom:
-  name: bathroom_light
+  name: Bathroom light
   entities:
-    - light.tradfri_bulb_10
-    - light.tradfri_bulb_12
-    - light.tradfri_bulb_11
-    - light.tradfri_bulb_9_2
+    - light.0x000b57fffed796a2_light
+    - light.0x000b3cfffef4fa58_light
+    - light.0x000b3cfffef27bb4_light
+    - light.0x000b3cfffef28412_light
 
 bathroom_half:
-  name: bathroom_light
+  name: Bathroom (half)
   entities:
-    - light.tradfri_bulb_10
-    - light.tradfri_bulb_12
+    - light.0x000b57fffed796a2_light
+    - light.0x000b3cfffef28412_light
