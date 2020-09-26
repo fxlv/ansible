@@ -12,8 +12,8 @@ homekit:
       - light
 
 
-sensor:
-  - platform: huesensor
+        #sensor:
+        #- platform: huesensor
   # unfortunately the developers of HA are not polline the HUE often enough (5sec) for the motion sensors to actually provide decent reaction speed
   # therefore for motion sensors, I poll them separately via the HUE API
   # probably a good idea would be to buy some sort of ZigBee dongle, or I wish the Philips HUE would add support for callbacks/hooks. I'm amazed they don't have it already.
@@ -36,22 +36,28 @@ switch:
     payload_off: "false"
 
 
-binary_sensor:
-  - platform: huesensor
-device_tracker:
-  - platform: huesensor
+    #binary_sensor:
+    #- platform: huesensor
+    #device_tracker:
+    #- platform: huesensor
 
 
-hue:
-  bridges:
-    - host: !secret hue_bridge_ip
-      allow_unreachable: true
+    #hue:
+    #bridges:
+    #- host: !secret hue_bridge_ip
+    #  allow_unreachable: true
 
 
 # Text to speech
-tts:
-  - platform: google_translate
-
+#tts:
+#  - platform: google_translate
 
 group: !include groups.yaml
 automation: !include automations.yaml
+timer:
+  wc:
+    duration: '00:07:00'
+  warderobe:
+    duration: '00:03:00'
+  bathroom:
+    duration: '00:07:00'

@@ -17,4 +17,5 @@
       - autoconf
       - libavahi-compat-libdnssd-dev
       - mosquitto
+      - mosquitto-clients
   become: true

@@ -14,6 +14,8 @@
     owner: ha
     group: ha
   become: true
+  tags:
+    - automations
 
 - name: deploy ha Groups file
   copy:
@@ -22,6 +24,8 @@
     owner: ha
     group: ha
   become: true
+  tags:
+    - groups
 
 - name: deploy ha Secrets file
   copy:
@@ -36,6 +40,9 @@
     name: home-assistant@ha.service
     state: restarted
   become: true
+  tags:
+    - automations
+    - groups
 
 - name: deploy zigbee2mqtt config file
   copy:

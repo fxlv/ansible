@@ -1,57 +1,74 @@
 ---
-hallway_lights:
-  name: Hallway lights
+wc:
+  name: WC Lights
   entities:
-    - light.0x90fd9ffffe10a45e_light
+    - group.wc_ceiling
+    - group.wc_sink
+wc_ceiling:
+  name: WC Lights in the ceiling
+  entities:
     - light.0x000b3cfffef6bd43_light
+    - light.0x90fd9ffffe10a45e_light
     - light.0x90fd9ffffe14568c_light
 
-hallway_lights_one:
-  name: Hallway lights (one)
-  entities:
-    - light.0x000b3cfffef6bd43_light
-
-bedroom_lights:
-  name: Bedroom lights
+wc_sink:
+  name: WC Lights above sink
   entities:
     - light.0x90fd9ffffe0fe782_light
     - light.0x000b3cfffeff1419_light
 
-living_room_lights:
-  name: Living room lights
-  entities:
-    - light.balls
-    - light.living_room_balls
-    - light.desk
-    - light.stavlampa
-
-living_room_lights_ceiling:
-  name: Living room ceiling lights
-  entities:
-    - light.living_room_1
-    - light.living_room_2
-
-living_room_lights_all:
-  name: Living room lights
-  entities:
-    - group.living_room_lights
-    - group.living_room_lights_ceiling
-
-wc:
-  name: wc_light
-  entities:
-    - light.0x90fd9ffffe0fe8a4_light
-
 bathroom:
-  name: Bathroom light
+  name: Bathroom
   entities:
-    - light.0x000b57fffed796a2_light
-    - light.0x000b3cfffef4fa58_light
-    - light.0x000b3cfffef27bb4_light
+    - group.bathroom_sink
+    - light.0x90fd9ffffe0fe8a4_light
+    - light.0x90fd9ffffe1000b3_light
+    - light.0x588e81fffe50827e_light
+    - light.0x680ae2fffe93fccc_light
     - light.0x000b3cfffef28412_light
+    - light.0x588e81fffe5ee43a_light
 
-bathroom_half:
-  name: Bathroom (half)
+bathroom_sink:
+  name: Bathroom above sink
   entities:
     - light.0x000b57fffed796a2_light
-    - light.0x000b3cfffef28412_light
+    - light.0x000b3cfffef27bb4_light
+
+bedroom:
+  name: bedroom lights
+  entities:
+    - light.0x842e14fffe1bda78_light
+    - light.0x000b3cfffef4fa58_light
+    - light.0x680ae2fffed10802_light
+    - light.0x588e81fffe447587_light
+warderobe:
+  name: warderobe
+  entities:
+  - light.0x588e81fffe509fa1_light
+  - light.0x588e81fffe522ae2_light
+  - light.0x842e14fffe1a5b20_light
+  - light.0x588e81fffe56d9a3_light
+  - light.0x680ae2fffe8feef9_light
+hallway2:
+  name: Interior hallway
+  entities:
+  - light.0x680ae2fffe4d9ebd_light
+  - light.0x680ae2fffec3fbd1_light
+  - light.0x680ae2fffed10698_light
+hallway:
+  name: Entrance hallway
+  entities:
+    - light.0x680ae2fffe96319a_light
+    - light.0x680ae2fffe563ffd_light
+    - light.0x680ae2fffed7ec2e_light
+    - light.0x680ae2fffe3df6dc_light
+    - light.0x680ae2fffef0756c_light
+kitchen:
+  name: Kitchen
+  entities:
+    - light.0x680ae2fffe3ddb75_light
+    - light.0x680ae2fffea4c86e_light
+    - light.0x680ae2fffe6eba51_light
+    - light.0x680ae2fffec9ed2a_light
+    - light.0x680ae2fffe3f13d6_light
+    - light.0x000b57fffed796a2_light
