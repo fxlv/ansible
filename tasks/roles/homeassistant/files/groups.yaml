@@ -59,6 +59,8 @@ hallway:
   name: Entrance hallway
   entities:
     - light.0x680ae2fffe96319a_light
+    - light.hallway2_light
+    - light.hallway4_light
     - light.0x680ae2fffe563ffd_light
     - light.0x680ae2fffed7ec2e_light
     - light.0x680ae2fffe3df6dc_light

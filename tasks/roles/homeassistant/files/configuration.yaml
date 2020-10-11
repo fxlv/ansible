@@ -25,6 +25,9 @@ homekit:
   #  scan_interval: 5
   #
 
+shell_command:
+  goodbye: /home/ha/goodbye.sh
+  hello: /home/ha/hello.sh
 
 # configure the state of allowing joining for zigbee devices
 switch:

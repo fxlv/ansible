@@ -11,6 +11,7 @@
     - condition: template
       value_template: '{{ "on" == trigger.payload_json.click }}'
   action:
+
     - service: light.turn_on
       entity_id:
         - group.hallway
@@ -19,6 +20,8 @@
       data:
         brightness_pct: 100
         transition: 2
+    - service: shell_command.hello
+
 
 - id: '15455917658'
   alias: Entrance, lights off
@@ -29,10 +32,50 @@
     - condition: template
       value_template: '{{ "off" == trigger.payload_json.click }}'
   action:
+    - service: shell_command.goodbye
+    - service: light.turn_off
+      entity_id: group.kitchen
+      data:
+        transition: 2
+    - delay:
+        seconds: 2
+    - service: light.turn_off
+      entity_id:
+        - light.0x680ae2fffef0756c_light
+      data:
+        transition: 2
+    - delay:
+        seconds: 2
+    - service: light.turn_off
+      entity_id:
+        - light.hallway4_light
+      data:
+        transition: 2
+    - delay:
+        seconds: 2
+
+    - service: light.turn_off
+      entity_id:
+        - light.0x680ae2fffed7ec2e_light
+      data:
+        transition: 2
+    - delay:
+        seconds: 2
+    
+    - service: light.turn_off
+      entity_id:
+        - light.hallway2_light
+      data:
+        transition: 2
+    - delay:
+        seconds: 2
+
     - service: light.turn_off
       entity_id: all
       data:
-        transition: 30
+        transition: 2
+    - service: switch.turn_off
+      entity_id: switch.0x84182600000f008d_switch
 
 
 
