@@ -114,8 +114,8 @@
 
 
 
-#
-# WC
+##################################################################
+# Guest bathroom
 #
 - id: 'wc_on_motion_day'
   alias: WC light ON
@@ -192,6 +192,7 @@
     - service: timer.start
       data:
         entity_id: timer.wc
+
 - id: 'wc_lights_off_after_timer'
   alias: WC lights off after timer
   trigger:
@@ -200,13 +201,47 @@
     event_data:
       entity_id: timer.wc
   action:
-    service: light.turn_off
-    data:
+    - service: light.turn_off
+      data:
       entity_id:
         - group.wc
+    - service: mqtt.publish
+      data:
+        topic: zigbee2mqtt/guest_bathroom_relay/l1/set
+        payload: "OFF"
+
+
+- id: 'guest_bathroom_fan_off'
+  alias: Guest bathroom fan off, once humidity is < 55
+  trigger:
+   - below: '55'
+     entity_id: sensor.0x00158d00053f0457_humidity
+     platform: numeric_state
+  action:
+    - service: mqtt.publish
+      data:
+        topic: zigbee2mqtt/guest_bathroom_relay/l1/set
+        payload: "OFF"
 
 
 
+- id: 'guest_bathroom_fan_on'
+  alias: Guest bathroom fan on, once humidity is > 65
+  trigger:
+   - above: '65'
+     entity_id: sensor.0x00158d00053f0457_humidity
+     platform: numeric_state
+  action:
+    - service: mqtt.publish
+      data:
+        topic: zigbee2mqtt/guest_bathroom_relay/l1/set
+        payload: "ON"
+
+
+
+#
+# end of Guest bathroom
+#################################################################
 
 
 #

@@ -168,3 +168,7 @@ devices:
     friendly_name: 'kitchen_counter_switch'
   '0xec1bbdfffed443f9':
     friendly_name: 'entrance_switch'
+  '0x00158d00042850f6':
+    friendly_name: 'guest_bathroom_relay'
+  '0x000d6ffffe63e559':
+    friendly_name: 'office_remote'
