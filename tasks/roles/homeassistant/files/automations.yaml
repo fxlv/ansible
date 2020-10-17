@@ -544,154 +544,6 @@
 #
 # end of warderobe
 #
-
-# On-Start automation to tell that HA is running
-#- id: '1114971034062'
-#  alias: HA started up
-#  trigger:
-#    platform: homeassistant
-#    event: start
-#  action:
-#    - service:
-#      entity_id: light.desk
-#      flash: short
-#    - service:
-#      entity_id: group.living_room_lights_ceiling
-#      flash: short
-# Living room lights on
-- id: '1544978034062'
-  alias: Living room switch ON
-  trigger:
-  - entity_id: sensor.hue_dimmer_living_room
-    platform: state
-    to: 1_click_up
-  condition: []
-  action:
-    
-    - service: light.turn_on
-      entity_id: light.balls
-    
-    - service: light.turn_on
-      entity_id: light.living_room_balls
-    
-    - service: light.turn_on
-      entity_id: light.desk
-      data_template: 
-        brightness: >
-          {% if is_state('light.desk', 'off') %}
-            {# If the light was completely off, set it to 70 #}
-            70
-            {% else %}
-            {# If the light was ON, the set brightness depending on current brightness #}
-            {% if states.light.desk.attributes.brightness < 70 %}
-              70
-              {% elif states.light.desk.attributes.brightness > 69 %}
-              {% if states.light.desk.attributes.brightness < 140 %}
-                140
-                {% else %}
-                255
-              {% endif %}
-            {% endif %}
-          {% endif %}
-          
-        transition: 5
-    
-    - service: light.turn_on
-      entity_id: light.stavlampa
-      data: 
-        brightness_pct: 50
-        transition: 5
-
-# Living room lights on, bright
-- id: '1544978034061'
-  alias: Living room switch ON, bright
-  trigger:
-  - entity_id: sensor.hue_dimmer_living_room
-    platform: state
-    to: 1_hold_up
-  condition: []
-  action:
-    
-    - service: light.turn_on
-      entity_id: light.balls
-    
-    - service: light.turn_on
-      entity_id: light.living_room_balls
-    
-    - service: light.turn_on
-      entity_id: light.desk
-      data: 
-        brightness_pct: 100
-        transition: 2
-    
-    - service: light.turn_on
-      entity_id: light.stavlampa
-      data: 
-        brightness_pct: 100
-        transition: 2
-# Living room lights off
-- id: '1545593976803'
-  alias: living room switch OFF
-  trigger:
-  - entity_id: sensor.hue_dimmer_living_room
-    platform: state
-    to: 4_click_up
-  condition: []
-  action:
-    - service: light.turn_off
-      entity_id: group.living_room_lights_all
-
-
-
-
-
-
-# Window lights only
-- id: '1545827322660'
-  alias: Window lights ON
-  trigger:
-  - entity_id: sensor.hue_dimmer_living_room
-    platform: state
-    to: 2_click_up
-  action:
-  - service: light.turn_on
-    data:
-      entity_id: light.balls
-
-# Ceiling lights only
-- id: '1545827568411'
-  alias: Ceiling lights ON
-  trigger:
-  - entity_id: sensor.hue_dimmer_living_room
-    platform: state
-    to: 3_click_up
-  action:
-  - service: light.turn_on
-    entity_id: light.living_room_1
-    data: 
-      brightness_pct: 50
-  - service: light.turn_on
-    entity_id: light.living_room_2
-    data: 
-      brightness_pct: 50
-
-# Ceiling lights only, bright
-- id: '1545827568479'
-  alias: Ceiling lights ON, bright
-  trigger:
-  - entity_id: sensor.hue_dimmer_living_room
-    platform: state
-    to: 3_hold_up
-  action:
-  - service: light.turn_on
-    entity_id: light.living_room_1
-    data: 
-      brightness_pct: 100
-  - service: light.turn_on
-    entity_id: light.living_room_2
-    data: 
-      brightness_pct: 100
-
 ####################################################
 # Bathroom lights during daytime
 ####################################################
@@ -1032,13 +884,10 @@
         - group.bathroom
 
 
-#
-# bathroom dimmer
-#
+####################################################
+# bathroom dimmer BEGIN
+####################################################
 
-
-# 
-#
 - id: 'bathroom_lights_toggle'
   alias: bathroom Lights Toggle
   trigger:
@@ -1081,3 +930,7 @@
       data:
         brightness_pct: 40
         transition: 5
+
+####################################################
+# bathroom dimmer END
+####################################################
