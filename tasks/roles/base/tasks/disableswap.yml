@@ -4,4 +4,3 @@
     name: dphys-swapfile.service
     enabled: no
   when: ansible_machine == "armv7l"
-

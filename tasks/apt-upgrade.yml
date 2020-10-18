@@ -24,7 +24,6 @@
       when: ansible_distribution=='Debian' or ansible_distribution=='Ubuntu'
       notify:
         - fetch the apt-get upgrade log file
-      # - debug: var=apt_upgrade.stdout_lines
 
   handlers:
     - name: fetch the apt-get upgrade log file

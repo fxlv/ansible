@@ -28,7 +28,7 @@
     owner=root
     group=root
   register: bgpnet_vpn
-
+handlers:
 - name: restart main vpn server
   systemd:
     name: openvpn@openvpn-main.service
