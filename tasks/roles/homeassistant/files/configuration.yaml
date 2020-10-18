@@ -64,3 +64,5 @@ timer:
     duration: '00:03:00'
   bathroom:
     duration: '00:07:00'
+  fan1:
+    duration: '00:10:00'

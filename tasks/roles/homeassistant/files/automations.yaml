@@ -11,7 +11,6 @@
     - condition: template
       value_template: '{{ "on" == trigger.payload_json.click }}'
   action:
-
     - service: light.turn_on
       entity_id:
         - group.hallway
@@ -61,7 +60,6 @@
         transition: 2
     - delay:
         seconds: 2
-    
     - service: light.turn_off
       entity_id:
         - light.hallway2_light
@@ -81,12 +79,69 @@
 
 
 
+####################################################
+# desk light BEGIN
+####################################################
+
+- id: 'desk_light_toggle'
+  alias: Desk Light ON
+  trigger:
+    - platform: mqtt
+      topic: "zigbee2mqtt/office_remote"
+  condition:
+    - condition: template
+      value_template: '{{ "toggle" == trigger.payload_json.action }}'
+  action:
+    - service: light.toggle
+      entity_id: light.0x0017880103419e5b_light
+
+
+- id: 'desk_light_bright'
+  alias: Desk light bright
+  trigger:
+    - platform: mqtt
+      topic: "zigbee2mqtt/office_remote"
+  condition:
+    - condition: template
+      value_template: '{{ "brightness_up_click" == trigger.payload_json.action }}'
+  action:
+    - service: light.turn_on
+      entity_id: light.0x0017880103419e5b_light
+      data:
+        brightness_pct: 100
+        transition: 2
+- id: 'desk_light_dim'
+  alias: Desk light dim
+  trigger:
+    - platform: mqtt
+      topic: "zigbee2mqtt/office_remote"
+  condition:
+    - condition: template
+      value_template: '{{ "brightness_down_click" == trigger.payload_json.action }}'
+  action:
+    - service: light.turn_on
+      entity_id: light.0x0017880103419e5b_light
+      data:
+        brightness_pct: 50
+        transition: 2
+
+
+####################################################
+# desk light END
+####################################################
+
+
+##################################################################
+# Guest bathroom BEGIN
+##################################################################
+
+
 #
-# Desk light
+# FAN switch in the guest bathroom
 #
 
-- id: '15455911199'
-  alias: Desk Light ON
+- id: 'guest_bathroom_fan_on'
+  alias: Guest bathroom fan on
   trigger:
     - platform: mqtt
       topic: "zigbee2mqtt/onoff_switch_1"
@@ -94,14 +149,15 @@
     - condition: template
       value_template: '{{ "on" == trigger.payload_json.click }}'
   action:
-    - service: light.turn_on
-      entity_id: light.0x0017880103419e5b_light
+    - service: timer.start
+      entity_id: timer.fan1
+    - service: mqtt.publish
       data:
-        brightness_pct: 100
-        transition: 2
+        topic: zigbee2mqtt/guest_bathroom_relay/l1/set
+        payload: "ON"
 
-- id: '15455911198'
-  alias: Desk Light OFF
+- id: 'guest_bathroom_fan_off'
+  alias: Guest bathroom fan off
   trigger:
     - platform: mqtt
       topic: "zigbee2mqtt/onoff_switch_1"
@@ -109,14 +165,29 @@
     - condition: template
       value_template: '{{ "off" == trigger.payload_json.click }}'
   action:
-    - service: light.turn_off
-      entity_id: light.0x0017880103419e5b_light
+    - service: timer.start
+      entity_id: timer.fan1
+    - service: mqtt.publish
+      data:
+        topic: zigbee2mqtt/guest_bathroom_relay/l1/set
+        payload: "OFF"
 
-
-
-##################################################################
-# Guest bathroom
+- id: 'guest_bathroom_fan_timer_off'
+  alias: guest bathroom timer off
+  trigger:
+    platform: event
+    event_type: timer.finished
+    event_data:
+      entity_id: timer.fan1
+  action:
+    - service: mqtt.publish
+      data:
+        topic: zigbee2mqtt/guest_bathroom_relay/l1/set
+        payload: "OFF"
 #
+# FAN switch in the guest bathroom END
+#
+
 - id: 'wc_on_motion_day'
   alias: WC light ON
   trigger:
@@ -135,8 +206,7 @@
         brightness_pct: 100
         transition: 2
     - service: timer.cancel
-      data:
-        entity_id: timer.wc
+      entity_id: timer.wc
 
 - id: 'wc_on_motion_evening'
   alias: WC light ON
@@ -156,8 +226,7 @@
         brightness_pct: 70
         transition: 5
     - service: timer.cancel
-      data:
-        entity_id: timer.wc
+      entity_id: timer.wc
 
 - id: 'wc_on_motion_night'
   alias: WC light ON
@@ -177,8 +246,8 @@
         brightness_pct: 40
         transition: 10
     - service: timer.cancel
-      data:
-        entity_id: timer.wc
+      entity_id: timer.wc
+
 
 - id: 'wc_off_motion_triggers_timer'
   alias: WC light Off motion
@@ -190,8 +259,8 @@
       value_template: '{{ false == trigger.payload_json.occupancy }}'
   action:
     - service: timer.start
-      data:
-        entity_id: timer.wc
+      entity_id: timer.wc
+
 
 - id: 'wc_lights_off_after_timer'
   alias: WC lights off after timer
@@ -202,9 +271,7 @@
       entity_id: timer.wc
   action:
     - service: light.turn_off
-      data:
-      entity_id:
-        - group.wc
+      entity_id: group.wc
     - service: mqtt.publish
       data:
         topic: zigbee2mqtt/guest_bathroom_relay/l1/set
@@ -237,11 +304,10 @@
         topic: zigbee2mqtt/guest_bathroom_relay/l1/set
         payload: "ON"
 
+##################################################################
+# Guest bathroom END
+##################################################################
 
-
-#
-# end of Guest bathroom
-#################################################################
 
 
 #
@@ -523,8 +589,7 @@
       value_template: '{{ false == trigger.payload_json.occupancy }}'
   action:
     - service: timer.start
-      data:
-        entity_id: timer.warderobe
+      entity_id: timer.warderobe
 
 - id: 'warderobe_lights_off_after_timer'
   alias: Warderobe lights off after timer
@@ -534,10 +599,8 @@
     event_data:
       entity_id: timer.warderobe
   action:
-    service: light.turn_off
-    data:
-      entity_id:
-        - group.warderobe
+    - service: light.turn_off
+      entity_id: group.warderobe
 
 #
 #
@@ -567,11 +630,11 @@
         entity_id: light.0x000b57fffed796a2_light
         state: 'off'
   action:
-  - service: light.turn_on
-    entity_id: group.bathroom
-    data_template:
-      brightness_pct: 100
-      transition: 5
+    - service: light.turn_on
+      entity_id: group.bathroom
+      data_template:
+        brightness_pct: 100
+        transition: 5
 
 ####################################################
 # Bathroom lights during evening and night
@@ -622,10 +685,10 @@
         after: '23:00'
         before: '07:00'  
   action:
-  - service: light.turn_off
-    data:
+    - service: light.turn_off
       entity_id: group.bathroom
-      transition: 30
+      data:
+        transition: 30
 
 
 ####################################################
@@ -645,10 +708,10 @@
     after: '07:00'
     before: '23:00'
   action:
-  - service: light.turn_off
-    data:
+    - service: light.turn_off
       entity_id: group.bathroom
-      transition: 20
+      data:
+        transition: 20
 
 
 
@@ -834,8 +897,7 @@
         brightness_pct: 70
         transition: 5
     - service: timer.cancel
-      data:
-        entity_id: timer.bathroom
+      entity_id: timer.bathroom
 
 - id: 'bathroom_on_motion_night'
   alias: bathroom light ON night
@@ -867,8 +929,7 @@
       value_template: '{{ false == trigger.payload_json.occupancy }}'
   action:
     - service: timer.start
-      data:
-        entity_id: timer.bathroom
+      entity_id: timer.bathroom
 
 - id: 'bathroom_lights_off_after_timer'
   alias: bathroom lights off after timer
@@ -879,9 +940,7 @@
       entity_id: timer.bathroom
   action:
     service: light.turn_off
-    data:
-      entity_id:
-        - group.bathroom
+    entity_id: group.bathroom
 
 
 ####################################################
