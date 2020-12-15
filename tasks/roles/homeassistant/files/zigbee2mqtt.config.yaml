@@ -166,9 +166,13 @@ devices:
     friendly_name: 'guest_bathroom_temperature_sensor'
   '0x84182600000f008d':
     friendly_name: 'kitchen_counter_switch'
+  '0x8418260000102ff8':
+    friendly_name: 'balcony_lights'
   '0xec1bbdfffed443f9':
     friendly_name: 'entrance_switch'
   '0x00158d00042850f6':
     friendly_name: 'guest_bathroom_relay'
   '0x000d6ffffe63e559':
     friendly_name: 'office_remote'
+  '0x00158d00054e91c5':
+    friendly_name: 'kitchen_relay'
