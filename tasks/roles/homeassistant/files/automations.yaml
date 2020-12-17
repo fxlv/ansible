@@ -607,63 +607,6 @@
 #
 # end of warderobe
 #
-####################################################
-# Bathroom lights during daytime
-####################################################
-- id: '1546261349037'
-  alias: bathroom motion during daytime
-  trigger:
-  - entity_id: binary_sensor.0x0017880102126284_occupancy
-    platform: state
-    from: 'off'
-    to: 'on'
-    #from: False
-    #to: True 
-  condition:
-    condition: and
-    conditions:
-      - condition: time
-        after: '07:00'
-        before: '22:30'
-      - condition: state
-        # if bathroom lights are off
-        entity_id: light.0x000b57fffed796a2_light
-        state: 'off'
-  action:
-    - service: light.turn_on
-      entity_id: group.bathroom
-      data_template:
-        brightness_pct: 100
-        transition: 5
-
-####################################################
-# Bathroom lights during evening and night
-####################################################
-- id: '1511269349037'
-  alias: wc motion during the evening/night
-  trigger:
-  - entity_id: binary_sensor.0x0017880102126284_occupancy
-    platform: state
-    from: 'off'
-    to: 'on'
-    #from: False
-    #to: True 
-  condition:
-    condition: and
-    conditions:
-      - condition: time
-        after: '22:30'
-        before: '07:00'
-      - condition: state
-        # if bathroom lights are off
-        entity_id: light.0x000b57fffed796a2_light
-        state: 'off'
-  action:
-  - service: light.turn_on
-    entity_id: group.bathroom_half
-    data_template:
-      brightness_pct: 20
-      transition: 10
 
 ####################################################
 # Bathroom lights off (night)

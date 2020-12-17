@@ -92,9 +92,6 @@ devices:
   '0x842e14fffe1a5b20':
     friendly_name: 'tradfri_light_12'
     retain: true
-  '0x588e81fffe56d9a3':
-    friendly_name: 'tradfri_light_13'
-    retain: true
   '0x680ae2fffe8feef9':
     friendly_name: 'tradfri_light_14'
     retain: true
@@ -157,7 +154,7 @@ devices:
   '0x680ae2fffea4c86e':
     friendly_name: 'kitchen2'
     retain: true
-  '0x000b57fffed796a2':
+  '0x588e81fffe56d9a3':
     friendly_name: 'kitchen6'
     retain: true
   '0x000d6ffffe9e0b4f':
