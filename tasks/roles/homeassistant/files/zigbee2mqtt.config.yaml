@@ -173,3 +173,9 @@ devices:
     friendly_name: 'office_remote'
   '0x00158d00054e91c5':
     friendly_name: 'kitchen_relay'
+  '0x841826000010320c':
+    friendly_name: 'kitchen_relay2'
+  '0x680ae2fffe5f0e8e':
+    friendly_name: 'color_bulb'
+  '0x680ae2fffe47fa33':
+    friendly_name: 'color_bulb_office'

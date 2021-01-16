@@ -66,3 +66,44 @@ timer:
     duration: '00:07:00'
   fan1:
     duration: '00:10:00'
+
+
+light:
+  - platform: "mqtt"
+    state_topic: "zigbee2mqtt/color_bulb_office"
+    availability_topic: "zigbee2mqtt/bridge/state"
+    brightness: true
+    name: office_color_bulb
+    color_temp: true
+    xy: true
+    hs: false
+    schema: "json"
+    command_topic: "zigbee2mqtt/color_bulb_office/set"
+    brightness_scale: 254
+    effect: true
+    effect_list:
+      - "blink"
+      - "breathe"
+      - "okay"
+      - "channel_change"
+      - "finish_effect"
+      - "stop_effect"
+  - platform: "mqtt"
+    state_topic: "zigbee2mqtt/color_bulb"
+    availability_topic: "zigbee2mqtt/bridge/state"
+    brightness: true
+    name: living_room_color_bulb
+    color_temp: true
+    xy: true
+    hs: false
+    schema: "json"
+    command_topic: "zigbee2mqtt/color_bulb/set"
+    brightness_scale: 254
+    effect: true
+    effect_list:
+      - "blink"
+      - "breathe"
+      - "okay"
+      - "channel_change"
+      - "finish_effect"
+      - "stop_effect"
