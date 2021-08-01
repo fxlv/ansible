@@ -174,8 +174,18 @@ devices:
   '0x00158d00054e91c5':
     friendly_name: 'kitchen_relay'
   '0x841826000010320c':
-    friendly_name: 'kitchen_relay2'
+    friendly_name: 'garden_bottle_pump'
   '0x680ae2fffe5f0e8e':
-    friendly_name: 'color_bulb'
+    friendly_name: 'garden_bottom'
   '0x680ae2fffe47fa33':
-    friendly_name: 'color_bulb_office'
+    friendly_name: 'garden_top'
+  '0x5c0272fffe6b603c':
+    friendly_name: 'garden_top_2'
+  '0x00158d0005867647':
+    friendly_name: "garden_relay"
+  '0x680ae2fffe4131e5':
+    friendly_name: "office_blinds"
+  '0x7cb03eaa0a0318fd':
+    friendly_name: "living_room_pump1"
+  '0x0017880102b55c0d':
+    friendly_name: "living_room_ceiling"

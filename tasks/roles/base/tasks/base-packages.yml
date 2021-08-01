@@ -23,3 +23,9 @@
       - dstat
       - strace
       - tmux
+- name: install backup tools
+  apt:
+    name: "{{ packages }}"
+  vars:
+    packages:
+      - restic
