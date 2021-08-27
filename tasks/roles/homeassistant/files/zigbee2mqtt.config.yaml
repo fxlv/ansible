@@ -24,9 +24,6 @@ map_options:
         active: '#009900'
         inactive: '#994444'
 devices:
-  '0x00178801032a771e':
-    friendly_name: 'guest_bathroom_motion'
-    retain: false
   '0x0017880106f48f41':
     friendly_name: 'warderobe_motion'
     retain: false
@@ -56,9 +53,6 @@ devices:
     retain: true
   '0x90fd9ffffe0fe782':
     friendly_name: 'wc_light_sink_1'
-    retain: false
-  '0x000b3cfffeff1419':
-    friendly_name: 'wc_light_sink_2'
     retain: false
   '0x000b3cfffef6bd43':
     friendly_name: 'wc_light_1'
@@ -174,7 +168,7 @@ devices:
   '0x00158d00054e91c5':
     friendly_name: 'kitchen_relay'
   '0x841826000010320c':
-    friendly_name: 'garden_bottle_pump'
+    friendly_name: 'bedroom_desk_power'
   '0x680ae2fffe5f0e8e':
     friendly_name: 'garden_bottom'
   '0x680ae2fffe47fa33':
@@ -189,3 +183,7 @@ devices:
     friendly_name: "living_room_pump1"
   '0x0017880102b55c0d':
     friendly_name: "living_room_ceiling"
+  '0x5c0272fffe8d4c71':
+    friendly_name: "wc_light_sink_2"
+  '0x0017880106f45100':
+    friendly_name: "guest_bathroom_motion"

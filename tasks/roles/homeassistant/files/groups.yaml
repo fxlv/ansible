@@ -15,7 +15,8 @@ wc_sink:
   name: WC Lights above sink
   entities:
     - light.0x90fd9ffffe0fe782_light
-    - light.0x000b3cfffeff1419_light
+    - light.0x5c0272fffe8d4c71_light
+
 
 bathroom:
   name: Bathroom
