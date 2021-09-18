@@ -54,7 +54,7 @@ devices:
   '0x90fd9ffffe0fe782':
     friendly_name: 'wc_light_sink_1'
     retain: false
-  '0x000b3cfffef6bd43':
+  '0x5c0272fffe75cee9':
     friendly_name: 'wc_light_1'
   '0x90fd9ffffe10a45e':
     friendly_name: 'wc_light_2'
@@ -77,17 +77,11 @@ devices:
   '0x842e14fffe1bda78':
     friendly_name: 'tradfri_warm_light_1'
     retain: true
-  '0x588e81fffe509fa1':
-    friendly_name: 'tradfri_light_10'
-    retain: true
   '0x588e81fffe522ae2':
     friendly_name: 'tradfri_light_11'
     retain: true
   '0x842e14fffe1a5b20':
     friendly_name: 'tradfri_light_12'
-    retain: true
-  '0x680ae2fffe8feef9':
-    friendly_name: 'tradfri_light_14'
     retain: true
   '0x0017880103118b70':
     friendly_name: 'living room lamp'
@@ -182,7 +176,9 @@ devices:
   '0x7cb03eaa0a0318fd':
     friendly_name: "living_room_pump1"
   '0x0017880102b55c0d':
-    friendly_name: "living_room_ceiling"
+    friendly_name: "living_room_ceiling_philips"
+  '0x680ae2fffe66e48c':
+    friendly_name: "living_room_ceiling_ikea_large"
   '0x5c0272fffe8d4c71':
     friendly_name: "wc_light_sink_2"
   '0x0017880106f45100':

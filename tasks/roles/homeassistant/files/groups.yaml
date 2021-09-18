@@ -7,9 +7,9 @@ wc:
 wc_ceiling:
   name: WC Lights in the ceiling
   entities:
-    - light.0x000b3cfffef6bd43_light
     - light.0x90fd9ffffe10a45e_light
     - light.0x90fd9ffffe14568c_light
+    - light.0x5c0272fffe75cee9_light
 
 wc_sink:
   name: WC Lights above sink
@@ -44,9 +44,6 @@ bedroom:
 warderobe:
   name: warderobe
   entities:
-  - light.0x588e81fffe509fa1_light
-  - light.0x588e81fffe522ae2_light
-  - light.0x842e14fffe1a5b20_light
   - light.0x680ae2fffe8feef9_light
 hallway2:
   name: Interior hallway
