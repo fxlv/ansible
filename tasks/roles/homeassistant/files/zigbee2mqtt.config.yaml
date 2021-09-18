@@ -187,3 +187,5 @@ devices:
     friendly_name: "wc_light_sink_2"
   '0x0017880106f45100':
     friendly_name: "guest_bathroom_motion"
+  '0x5c0272fffec4f84e':
+    friendly_name: "bedroom_radiator"

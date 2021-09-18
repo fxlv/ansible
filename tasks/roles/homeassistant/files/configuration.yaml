@@ -59,7 +59,7 @@ group: !include groups.yaml
 automation: !include automations.yaml
 timer:
   wc:
-    duration: '00:07:00'
+    duration: '00:10:00'
   warderobe:
     duration: '00:03:00'
   bathroom:
