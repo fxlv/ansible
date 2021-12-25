@@ -7,8 +7,30 @@
         commands: /system resource print
       register: routeros_resources
       when: ansible_network_os == 'routeros'
+    - name: Gather data on files
+      community.routeros.command:
+        commands: 
+          - :global backupfiles [/file find name~"*.backup"]
+          - :foreach backupfile in=$backupfiles do={ :put [ /file get $backupfile name ] }
+      register: routeros_files
+      when: ansible_network_os == 'routeros'
 
+    - name: copy file from ansible controller to a network device
+      ansible.netcommon.net_put:
+        src: files/kube-zabbix.list
+        dest: kube-zabbix.list.rsc
+
+    - community.routeros.facts:
+        gather_subset:
+          - hardware
+    - debug:
+        var: ansible_net_config
+  
     - name: Display stats
       debug:
-        msg:
-          - "Router OS resources: {{ routeros_resources.stdout }}"
+        var:
+          routeros_resources.stdout_lines
+    - name: Display Files
+      debug:
+        var:
+          routeros_files
