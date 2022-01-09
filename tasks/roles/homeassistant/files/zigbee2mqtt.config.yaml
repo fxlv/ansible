@@ -9,6 +9,7 @@ advanced:
   rtscts: false
   report: true
   availability_timeout: 120
+  log_level: debug
 map_options:
   graphviz:
     colors:
@@ -64,8 +65,6 @@ devices:
   '0x000b3cfffef4fa58':
     friendly_name: 'tradfri_light_5'
     retain: true
-  '0x000b3cfffef27bb4':
-    friendly_name: 'bathroom_sink_1'
   '0x90fd9ffffe14568c':
     friendly_name: 'wc_light_3'
   '0x680ae2fffec3fbd1':
@@ -175,10 +174,6 @@ devices:
     friendly_name: "office_blinds"
   '0x7cb03eaa0a0318fd':
     friendly_name: "living_room_pump1"
-  '0x0017880102b55c0d':
-    friendly_name: "living_room_ceiling_philips"
-  '0x680ae2fffe66e48c':
-    friendly_name: "living_room_ceiling_ikea_large"
   '0x5c0272fffe8d4c71':
     friendly_name: "wc_light_sink_2"
   '0x0017880106f45100':
