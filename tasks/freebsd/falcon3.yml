@@ -1,0 +1,29 @@
+---
+- hosts: falcon3
+  gather_facts: true
+  tasks:
+    - name: ping
+      ping:
+    - name: Enable zabbix_server in rc.conf
+      lineinfile:
+        path: /etc/rc.conf
+        line: zabbix_server_enable="YES"
+      become: true
+    - name: Enable nginx in rc.conf
+      lineinfile:
+        path: /etc/rc.conf
+        line: nginx_enable="YES"
+      become: true
+    - name: Enable php-fpm in rc.conf
+      lineinfile:
+        path: /etc/rc.conf
+        line: php_fpm_enable="YES"
+      become: true
+    - name: define php.ini file
+      ansible.builtin.copy:
+        src:  freebsd.php.ini
+        dest: /usr/local/etc/php.ini
+        owner: root
+        group: wheel
+        mode: '0644'
+      become: true

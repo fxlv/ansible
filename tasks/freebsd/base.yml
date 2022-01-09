@@ -1,0 +1,32 @@
+---
+- hosts: all
+  gather_facts: true
+  become: true
+  tasks:
+    - name: ping
+      ping:
+    - name: Enable NFS client
+      lineinfile:
+        path: /etc/rc.conf
+        line: nfs_client_enable="YES"
+    - name: Enable NFS in rc.conf
+      lineinfile:
+        path: /etc/rc.conf
+        line: nfs_client_enable="YES"
+    - name: Enable NFS mounting in fstab
+      lineinfile:
+        path: /etc/fstab
+        line: '{{nfs_server}}:{{nfs_mount_path}}      /nfs    nfs     rw      0       0'
+    - name: install base base-packages
+      pkgng:
+        name: sudo,htop,git,bash,screen,vim,mc,freecolor
+        state: present
+    - name: Remove the default freebsd user
+      ansible.builtin.user:
+        name: freebsd
+        state: absent
+        remove: yes
+    - name: disable root password
+      ansible.builtin.user:
+        name: root
+        password_lock: true

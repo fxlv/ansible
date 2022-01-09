@@ -1,0 +1,13 @@
+---
+- hosts: falcon1
+  gather_facts: true
+  become: true
+  tasks:
+    - name: Define MySQL DB directory
+      lineinfile:
+        path: /etc/rc.conf
+        line: 'mysql_dbdir="{{mysql_dbdir}}"'
+    - name: install packages for tickety and pytracker
+      pkgng:
+        name: py38-lxml
+        state: present
