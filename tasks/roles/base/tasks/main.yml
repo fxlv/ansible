@@ -9,5 +9,3 @@
   when: ansible_os_family == "Debian"
 - include: disableswap.yml
   when: ansible_os_family == "Debian"
-- include: nfs.yml
-  when: ansible_os_family == "Debian" and ansible_architecture == "armv7l"
