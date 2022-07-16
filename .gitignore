@@ -1,4 +1,5 @@
 log/*
+.venv
 .DS_Store
 *.pyc
 *.retry
