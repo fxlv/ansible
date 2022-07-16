@@ -7,10 +7,23 @@
 
       # create user on Debian
     - name: create Debian user
-      user: name=fx comment="FX" shell="/bin/bash"
+      user: 
+        name: fx 
+        comment: "FX" 
+        shell: "/bin/bash"
+        password: "!"
       become: true
       when: ansible_distribution=='Debian'
         or ansible_distribution=='OSMC'
+        or ansible_distribution=='Ubuntu'
+
+
+    - name: remove password from root user
+      user: 
+        name: root
+        password: "!"
+      become: true
+      when: ansible_distribution=='Debian'
         or ansible_distribution=='Ubuntu'
 
       # create used on FreeBSD
