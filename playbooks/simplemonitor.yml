@@ -1,0 +1,78 @@
+---
+# deploy https://github.com/jamesoff/simplemonitor
+- name: "Install and configure simplemonitor"
+  hosts: all
+  tasks:
+    # deploy a user
+    - name: Create "monitor" user
+      ansible.builtin.user:
+        name: monitor
+        comment: "Simplemonitor user"
+        shell: "/bin/bash"
+      become: true
+    - name: Install Python venv and PIP modules
+      become: true
+      become_user: monitor
+      block:
+        - name: Create venv
+          ansible.builtin.pip:
+            virtualenv_command: /opt/python/bin/python3 -m venv
+            virtualenv: /home/monitor/venv
+            name:
+              - pip
+        - name: Install Bcrypt via shell
+          # Bcrypt is a pesky module and needs a rust compiler
+          # if I use pip module, then I am not sure I can specify the path for it
+          # hence this workaround of using shell module
+          # note that this is only necessary when bcrypt is built from source, such as with RaspberryPi cases
+          ansible.builtin.shell: |
+            PATH=/home/monitor/.cargo/bin:$PATH /home/monitor/venv/bin/pip install bcrypt paramiko
+          when: ansible_architecture == "armv7l" or ansible_architecture == "aarch64"
+        - name: Install dependencies
+          ansible.builtin.pip:
+            virtualenv_command: /opt/python/bin/python3 -m venv
+            virtualenv: /home/monitor/venv
+            name:
+              - requests
+              - arrow
+              - click
+              - ping3
+              - psutil
+              - Jinja2
+        - name: Install simplemonitor
+          ansible.builtin.pip:
+            virtualenv_command: /opt/python/bin/python3 -m venv
+            virtualenv: /home/monitor/venv
+            name:
+              - simplemonitor
+        - name: Deploy configuration files
+          ansible.builtin.template:
+            src: "{{ item }}.j2"
+            dest: "/home/monitor/{{ item }}"
+            owner: monitor
+            group: monitor
+            mode: '0644'
+          with_items:
+            - monitor.ini
+            - monitors.ini
+          tags:
+            - config
+    - name: Deploy systemd unit
+      ansible.builtin.template:
+        src: simplemonitor.systemd
+        dest: /etc/systemd/system/simplemonitor.service
+        owner: root
+        group: root
+        mode: '0644'
+      tags:
+        - config
+      become: true
+    - name: Enable and start simplemonitor
+      ansible.builtin.systemd:
+        name: simplemonitor
+        state: restarted
+        enabled: true
+      become: true
+        # install simplemonitor pip package
+        # deploy configuration files
+        # deploy systemd unit
