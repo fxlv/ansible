@@ -1,11 +1,11 @@
 ---
-- include: base-packages.yml
+- include_tasks: base-packages.yml
   when: ansible_os_family == "Debian"
-- include: motd.yml
+- include_tasks: motd.yml
   when: ansible_os_family == "Debian"
-- include: locales.yml
+- include_tasks: locales.yml
   when: ansible_os_family == "Debian"
-- include: resolver.yml
+- include_tasks: resolver.yml
   when: ansible_os_family == "Debian"
-- include: disableswap.yml
+- include_tasks: disableswap.yml
   when: ansible_os_family == "Debian"
