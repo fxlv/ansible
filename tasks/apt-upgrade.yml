@@ -1,38 +1,34 @@
 ---
-- hosts: all
-  gather_facts: yes
-  become: yes
+- name: Update and upgrade Debian/Ubuntu packages
+  hosts: all
+  gather_facts: true
+  become: true
   strategy: free
 
+  vars:
+    log_filename: "apt-upgrade_{{ ansible_date_time.date }}-{{ ansible_date_time.time }}.log"
+    
   tasks:
-    - name: update the apt cache
-      apt: >
-        update_cache=yes
-        cache_valid_time=300
+    - name: Update APT package cache
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 300
       register: apt_update
-      when: ansible_distribution=='Debian' or ansible_distribution=='Ubuntu'
-      # - debug: var=apt_update.stdout_lines
+      when: ansible_os_family == "Debian"
 
-    - name: upgrade all packages
-      apt:
+    - name: Upgrade all packages
+      ansible.builtin.apt:
         upgrade: dist
-        dpkg_options: "force-confold,force-confdef,log=\
-          /var/log/apt-upgrade_{{ ansible_date_time.date }}-\
-          {{ ansible_date_time.time }}.log"
+        dpkg_options: "force-confold,force-confdef,log=/var/log/{{ log_filename }}"
         cache_valid_time: 300
       register: apt_upgrade
-      when: ansible_distribution=='Debian' or ansible_distribution=='Ubuntu'
-      notify:
-        - fetch the apt-get upgrade log file
+      when: ansible_os_family == "Debian"
+      notify: Fetch APT upgrade log file
 
   handlers:
-    - name: fetch the apt-get upgrade log file
-      fetch:
-        src: "/var/log/apt-upgrade_\
-          {{ ansible_date_time.date }}-{{ ansible_date_time.time }}.log"
-        dest: "{{ log_dir }}/{{ ansible_date_time.month }}/\
-          {{ ansible_date_time.day }}/{{ ansible_hostname }}/\
-          apt-upgrade-{{ ansible_date_time.date }}-\
-          {{ ansible_date_time.time }}.log"
-        flat: yes
-      when: ( ansible_distribution=='Debian' or ansible_distribution=='Ubuntu' ) and apt_upgrade.changed
+    - name: Fetch APT upgrade log file
+      ansible.builtin.fetch:
+        src: "/var/log/{{ log_filename }}"
+        dest: "{{ log_dir | default('/tmp') }}/{{ ansible_date_time.month }}/{{ ansible_date_time.day }}/{{ ansible_hostname }}/{{ log_filename }}"
+        flat: true
+      when: apt_upgrade is changed
