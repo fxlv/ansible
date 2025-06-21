@@ -1,0 +1,73 @@
+---
+- name: Install Docker and Docker Compose on Debian/Ubuntu
+  hosts: all
+  become: true
+
+  vars:
+    docker_apt_key_url: https://download.docker.com/linux/debian/gpg
+    docker_repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian {{ ansible_distribution_release | lower }} stable"
+    docker_packages:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-buildx-plugin
+      - docker-compose-plugin
+
+  tasks:
+
+    - name: Ensure dependencies are installed
+      apt:
+        name:
+          - ca-certificates
+          - curl
+          - gnupg
+        state: present
+        update_cache: true
+
+    - name: Create directory for Docker GPG key
+      file:
+        path: /etc/apt/keyrings
+        state: directory
+        mode: '0755'
+
+    - name: Download Docker GPG key
+      ansible.builtin.get_url:
+        url: "{{ docker_apt_key_url }}"
+        dest: /etc/apt/keyrings/docker.gpg
+        mode: '0644'
+
+    - name: Add Docker repository
+      ansible.builtin.apt_repository:
+        repo: "{{ docker_repo }}"
+        filename: docker
+        state: present
+        update_cache: true
+
+    - name: Install Docker packages
+      apt:
+        name: "{{ docker_packages }}"
+        state: present
+
+    - name: Ensure Docker service is running
+      service:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: Verify Docker version
+      command: docker --version
+      register: docker_version_output
+      changed_when: false
+
+    - name: Show Docker version
+      debug:
+        msg: "{{ docker_version_output.stdout }}"
+
+    - name: Verify Docker Compose plugin
+      command: docker compose version
+      register: docker_compose_version_output
+      changed_when: false
+
+    - name: Show Docker Compose version
+      debug:
+        msg: "{{ docker_compose_version_output.stdout }}"
