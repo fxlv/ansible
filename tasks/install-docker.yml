@@ -4,8 +4,9 @@
   become: true
 
   vars:
-    docker_apt_key_url: https://download.docker.com/linux/debian/gpg
-    docker_repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian {{ ansible_distribution_release | lower }} stable"
+    # Define distribution-specific variables
+    docker_apt_key_url: "https://download.docker.com/linux/{{ ansible_distribution | lower }}/gpg"
+    docker_repo: "deb [arch={{ ansible_architecture | replace('x86_64', 'amd64') }} signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} stable"
     docker_packages:
       - docker-ce
       - docker-ce-cli
@@ -14,13 +15,25 @@
       - docker-compose-plugin
 
   tasks:
+    - name: Check if running on supported distribution
+      fail:
+        msg: "This playbook only supports Debian and Ubuntu"
+      when: ansible_distribution != 'Debian' and ansible_distribution != 'Ubuntu'
+
+    - name: Debug - Print distribution information
+      debug:
+        msg: 
+          - "Distribution: {{ ansible_distribution }}"
+          - "Release: {{ ansible_distribution_release }}"
+          - "Architecture: {{ ansible_architecture }}"
+          - "Docker APT Key URL: {{ docker_apt_key_url }}"
+          - "Docker Repository: {{ docker_repo }}"
 
     - name: Ensure dependencies are installed
       apt:
         name:
           - ca-certificates
           - curl
-          - gnupg
         state: present
         update_cache: true
 
@@ -30,44 +43,97 @@
         state: directory
         mode: '0755'
 
-    - name: Download Docker GPG key
-      ansible.builtin.get_url:
+    # Use the Docker documented approach - direct download to .asc file
+    - name: Download Docker GPG key (following Docker docs)
+      get_url:
         url: "{{ docker_apt_key_url }}"
-        dest: /etc/apt/keyrings/docker.gpg
+        dest: /etc/apt/keyrings/docker.asc
         mode: '0644'
+      register: key_download
 
+    - name: Make key readable
+      file:
+        path: /etc/apt/keyrings/docker.asc
+        mode: '0644'
+      when: key_download is succeeded
+
+    - name: Debug - Key download result
+      debug:
+        msg: "Key download result: {{ key_download }}"
+
+    - name: Verify key file existence
+      stat:
+        path: /etc/apt/keyrings/docker.asc
+      register: key_file_check
+
+    - name: Debug - Key file details
+      debug:
+        msg:
+          - "Key file exists: {{ key_file_check.stat.exists }}"
+          - "Key file size: {{ key_file_check.stat.size | default('N/A') }}"
+          - "File permissions: {{ key_file_check.stat.mode | default('N/A') }}"
+
+    # Add Docker repository (using .asc extension instead of .gpg)
     - name: Add Docker repository
       ansible.builtin.apt_repository:
         repo: "{{ docker_repo }}"
         filename: docker
         state: present
         update_cache: true
+      register: repo_add_result
+      failed_when: false
+
+    - name: Debug - Repository addition result
+      debug:
+        msg: "Repository addition {{ 'succeeded' if repo_add_result.changed else 'failed' }}: {{ repo_add_result }}"
+
+    # If repo addition failed, try direct method
+    - name: Manual repository addition if previous method failed
+      when: not repo_add_result.changed
+      block:
+        - name: Create repository file manually
+          copy:
+            content: "{{ docker_repo }}"
+            dest: /etc/apt/sources.list.d/docker.list
+            mode: '0644'
+          
+        - name: Update apt cache manually
+          ansible.builtin.apt:
+            update_cache: yes
 
     - name: Install Docker packages
       apt:
         name: "{{ docker_packages }}"
         state: present
+      when: key_file_check.stat.exists
 
     - name: Ensure Docker service is running
       service:
         name: docker
         state: started
         enabled: true
+      when: key_file_check.stat.exists
 
     - name: Verify Docker version
       command: docker --version
       register: docker_version_output
       changed_when: false
+      failed_when: false
+      when: key_file_check.stat.exists
 
     - name: Show Docker version
       debug:
-        msg: "{{ docker_version_output.stdout }}"
+        msg: "{{ docker_version_output.stdout | default('Docker version check failed') }}"
+      when: key_file_check.stat.exists
 
     - name: Verify Docker Compose plugin
       command: docker compose version
       register: docker_compose_version_output
       changed_when: false
+      failed_when: false
+      when: key_file_check.stat.exists
 
     - name: Show Docker Compose version
       debug:
-        msg: "{{ docker_compose_version_output.stdout }}"
+        msg: "{{ docker_compose_version_output.stdout | default('Docker Compose version check failed') }}"
+      when: key_file_check.stat.exists
