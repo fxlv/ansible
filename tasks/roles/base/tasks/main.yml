@@ -1,11 +1,8 @@
 ---
-- include_tasks: base-packages.yml
-  when: ansible_os_family == "Debian"
-- include_tasks: motd.yml
-  when: ansible_os_family == "Debian"
-- include_tasks: locales.yml
-  when: ansible_os_family == "Debian"
-- include_tasks: resolver.yml
-  when: ansible_os_family == "Debian"
-- include_tasks: disableswap.yml
+- block:
+  - include_tasks: base-packages.yml
+  - include_tasks: motd.yml
+  - include_tasks: locales.yml
+  - include_tasks: resolver.yml
+  - include_tasks: disableswap.yml
   when: ansible_os_family == "Debian"
