@@ -5,4 +5,5 @@
   - include_tasks: locales.yml
   - include_tasks: resolver.yml
   - include_tasks: disableswap.yml
+  - include_tasks: ssh-security.yml
   when: ansible_os_family == "Debian"

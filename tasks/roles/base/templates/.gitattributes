@@ -1,0 +1,1 @@
+sshd_config.j2 filter=git-crypt diff=git-crypt

@@ -1,0 +1,32 @@
+---
+- name: Install OpenSSH server
+  apt:
+    name: openssh-server
+    state: present
+
+- name: Backup original sshd_config
+  copy:
+    src: /etc/ssh/sshd_config
+    dest: /etc/ssh/sshd_config.backup
+    remote_src: yes
+    force: no
+
+- name: Configure secure SSH settings
+  template:
+    src: sshd_config.j2
+    dest: /etc/ssh/sshd_config
+    owner: root
+    group: root
+    mode: '0644'
+    backup: yes
+  notify: restart ssh
+
+- name: Validate SSH configuration
+  command: sshd -t
+  changed_when: false
+
+- name: Ensure SSH service is enabled and started
+  systemd:
+    name: ssh
+    enabled: yes
+    state: started
