@@ -1,83 +1,99 @@
 ---
-- hosts: all
+- name: Deploy FX user account and configuration
+  hosts: all
   gather_facts: true
+  become: true
+  
+  vars:
+    user: fx
+    fx_comment: "FX System Administrator"
+    fx_shell: "/bin/bash"
+    debian_like_distros:
+      - "Debian"
+      - "Ubuntu" 
+      - "OSMC"
+    
   tasks:
-    - name: ping
+    - name: Verify connectivity
       ping:
+      become: false
 
-      # create user on Debian
-    - name: create Debian user
-      user: 
-        name: fx 
-        comment: "FX" 
-        shell: "/bin/bash"
+    - name: Create FX user on Debian-like systems
+      user:
+        name: "{{ user }}"
+        comment: "{{ fx_comment }}"
+        shell: "{{ fx_shell }}"
         password: "!"
-      become: true
-      when: ansible_distribution=='Debian'
-        or ansible_distribution=='OSMC'
-        or ansible_distribution=='Ubuntu'
+        create_home: true
+        state: present
+      when: ansible_distribution in debian_like_distros
 
+    - name: Create FX user on FreeBSD
+      user:
+        name: "{{ user }}"
+        comment: "{{ fx_comment }}"
+        shell: "{{ fx_shell }}"
+        create_home: true
+        state: present
+      when: ansible_distribution == "FreeBSD"
 
-    - name: remove password from root user
-      user: 
+    - name: Disable root password on Debian-like systems
+      user:
         name: root
         password: "!"
-      become: true
-      when: ansible_distribution=='Debian'
-        or ansible_distribution=='Ubuntu'
+      when: ansible_distribution in debian_like_distros
 
-      # create used on FreeBSD
-    - name: create FreeBSD user
-      user: name=fx comment="FX"
-      become: true
-      when: ansible_distribution=='FreeBSD'
+    - name: Check if primary SSH key exists locally
+      stat:
+        path: "{{ lookup('env','HOME') }}/.ssh/id_rsa.pub"
+      delegate_to: localhost
+      become: false
+      register: primary_ssh_key
+      run_once: true
 
-      # take the SSH pub key from OSX
-    - name: set up ssh key
-      authorized_key: user=fx
-                      key="{{ lookup('file',lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"
-      become: true
-      # take the SSH pub key from OSX
-    - name: set up secondary
+    - name: Set up primary SSH key
       authorized_key:
-        user: fx
-        key: '{{ item }}'
-      with_file:
-        - secondayssh.key
-      become: true
-      # set up sudoers file only for Debian machines
-    - name: sudoers Debian
-      copy: src=templates/sudoers_fx.j2
-            dest=/etc/sudoers.d/fx
-            owner=root group=root mode=0440
-      become: true
-      when: ansible_distribution=='Debian'
-        or ansible_distribution=='OSMC'
-        or ansible_distribution=='Ubuntu'
+        user: "{{ user }}"
+        key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"
+        state: present
+      when: primary_ssh_key.stat.exists
 
-      # on FreeBSD sudoers file is in different location
-    - name: sudoers FreeBSD
-      copy: src=templates/sudoers_fx.j2
-            dest=/usr/local/etc/sudoers.d/fx
-            owner=root group=wheel mode=0440
-      become: true
-      when: ansible_distribution=="FreeBSD"
+    - name: Set up secondary SSH key
+      authorized_key:
+        user: "{{ user }}"
+        key: "{{ lookup('file', 'secondayssh.key') }}"
+        state: present
 
-      # On Digitalocean, sudoers.d by default is not honored
-    - name: Make sure includes are used for sudoers
+    - name: Deploy sudoers configuration for Debian-like systems
+      template:
+        src: templates/sudoers_fx.j2
+        dest: /etc/sudoers.d/fx
+        owner: root
+        group: root
+        mode: '0440'
+        validate: 'visudo -cf %s'
+      when: ansible_distribution in debian_like_distros
+
+    - name: Deploy sudoers configuration for FreeBSD
+      template:
+        src: templates/sudoers_fx.j2
+        dest: /usr/local/etc/sudoers.d/fx
+        owner: root
+        group: wheel
+        mode: '0440'
+        validate: 'visudo -cf %s'
+      when: ansible_distribution == "FreeBSD"
+
+    - name: Ensure sudoers.d include is enabled on FreeBSD
       lineinfile:
-        dest: /usr/local/etc/sudoers
+        path: /usr/local/etc/sudoers
         line: "#includedir /usr/local/etc/sudoers.d"
-      when: ansible_distribution=="FreeBSD"
-      become: true
+        state: present
+        validate: 'visudo -cf %s'
+      when: ansible_distribution == "FreeBSD"
 
-      # remove the sudoers 'waagent' file that is created
-      # for new Azure machines as it will clash with our own
-    - name: remove /etc/sudoers.d/waagent
-      file: path=/etc/sudoers.d/waagent state=absent
-      become: true
-      when:
-        ansible_distribution=="Debian"
-          or ansible_distribution=='OSMC'
-          or ansible_distribution=='Ubuntu'
-        and ansible_virtualization_type=="VirtualPC"
+    - name: Remove conflicting Azure waagent sudoers file
+      file:
+        path: /etc/sudoers.d/waagent
+        state: absent
+      when: ansible_distribution in debian_like_distros
