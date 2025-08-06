@@ -1,0 +1,54 @@
+---
+- name: Install and configure tmux
+  hosts: all
+  become: true
+  tasks:
+    - name: Install tmux package (Debian/Ubuntu)
+      apt:
+        name: tmux
+        state: present
+        update_cache: true
+      when: ansible_os_family == "Debian"
+
+    - name: Install tmux package (FreeBSD)
+      pkgng:
+        name: tmux
+        state: present
+      when: ansible_os_family == "FreeBSD"
+
+    - name: Install git if not present (Debian/Ubuntu)
+      apt:
+        name: git
+        state: present
+      when: ansible_os_family == "Debian"
+
+    - name: Install git if not present (FreeBSD)
+      pkgng:
+        name: git
+        state: present
+      when: ansible_os_family == "FreeBSD"
+
+- name: Configure tmux for users
+  hosts: all
+  become: false
+  tasks:
+    - name: Clone gpakosz tmux configuration
+      git:
+        repo: https://github.com/gpakosz/.tmux.git
+        dest: "{{ ansible_env.HOME }}/.tmux"
+        version: master
+        force: true
+
+    - name: Create symlink to tmux configuration
+      file:
+        src: "{{ ansible_env.HOME }}/.tmux/.tmux.conf"
+        dest: "{{ ansible_env.HOME }}/.tmux.conf"
+        state: link
+        force: true
+
+    - name: Copy local tmux configuration template
+      copy:
+        src: "{{ ansible_env.HOME }}/.tmux/.tmux.conf.local"
+        dest: "{{ ansible_env.HOME }}/.tmux.conf.local"
+        remote_src: true
+        force: false
