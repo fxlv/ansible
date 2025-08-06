@@ -1,0 +1,60 @@
+---
+- name: Install Neovim editor from AppImage
+  hosts: all
+  become: false
+
+  tasks:
+
+    - name: Create ~/opt/bin directory
+      file:
+        path: ~/opt/bin
+        state: directory
+        mode: '0700'
+
+    - name: Backup existing nvim config directory
+      command: mv ~/.config/nvim ~/.config/nvim.bak
+      args:
+        creates: ~/.config/nvim.bak
+      ignore_errors: true
+
+    - name: Backup existing nvim data directory
+      command: mv ~/.local/share/nvim ~/.local/share/nvim.bak
+      args:
+        creates: ~/.local/share/nvim.bak
+      ignore_errors: true
+
+    - name: Backup existing nvim state directory
+      command: mv ~/.local/state/nvim ~/.local/state/nvim.bak
+      args:
+        creates: ~/.local/state/nvim.bak
+      ignore_errors: true
+
+    - name: Backup existing nvim cache directory
+      command: mv ~/.cache/nvim ~/.cache/nvim.bak
+      args:
+        creates: ~/.cache/nvim.bak
+      ignore_errors: true
+
+    - name: Download Neovim AppImage
+      get_url:
+        url: https://github.com/neovim/neovim/releases/download/stable/nvim-linux-arm64.appimage
+        dest: ~/opt/bin/nvim
+        mode: '0755'
+
+    - name: Clone LazyVim starter configuration
+      git:
+        repo: https://github.com/LazyVim/starter
+        dest: ~/.config/nvim
+        force: true
+
+    - name: Remove .git directory from nvim config
+      file:
+        path: ~/.config/nvim/.git
+        state: absent
+
+    - name: Add ~/opt/bin to PATH in bashrc
+      lineinfile:
+        path: ~/.bashrc
+        line: 'export PATH="$HOME/opt/bin:$PATH"'
+        regexp: '^export PATH=.*opt/bin.*'
+        state: present
