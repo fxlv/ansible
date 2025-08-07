@@ -1,0 +1,22 @@
+[Unit]
+Description=Prometheus Server
+Documentation=https://prometheus.io/docs/
+After=network.target
+
+[Service]
+Type=simple
+User={{ prometheus_user }}
+Group={{ prometheus_group }}
+ExecStart={{ prometheus_bin_dir }}/prometheus \
+  --config.file={{ prometheus_config_dir }}/prometheus.yml \
+  --storage.tsdb.path={{ prometheus_data_dir }} \
+  --web.console.templates={{ prometheus_home }}/consoles \
+  --web.console.libraries={{ prometheus_home }}/console_libraries \
+  --web.listen-address=0.0.0.0:9090 \
+  --web.external-url=http://localhost:9090/
+Restart=always
+RestartSec=5
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target
