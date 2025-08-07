@@ -1,0 +1,109 @@
+---
+- name: Install and configure Prometheus Node Exporter
+  hosts: all
+  become: yes
+  vars:
+    node_exporter_version: "1.9.1"
+    node_exporter_user: "nodeexporter"
+    node_exporter_group: "nodeexporter"
+    node_exporter_home: "/opt/node_exporter"
+    node_exporter_bin_dir: "{{ node_exporter_home }}/bin"
+    node_exporter_arch: "{% if ansible_architecture == 'x86_64' %}linux-amd64{% elif ansible_architecture == 'aarch64' %}linux-arm64{% elif ansible_architecture == 'armv7l' %}linux-armv7{% else %}linux-amd64{% endif %}"
+
+  tasks:
+    - name: Check if node_exporter is already installed
+      stat:
+        path: "{{ node_exporter_bin_dir }}/node_exporter"
+      register: node_exporter_binary
+
+    - name: Create node_exporter group
+      group:
+        name: "{{ node_exporter_group }}"
+        state: present
+
+    - name: Create node_exporter user
+      user:
+        name: "{{ node_exporter_user }}"
+        group: "{{ node_exporter_group }}"
+        home: "{{ node_exporter_home }}"
+        shell: /bin/false
+        system: yes
+        create_home: no
+        state: present
+
+    - name: Create node_exporter directories
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: "{{ node_exporter_user }}"
+        group: "{{ node_exporter_group }}"
+        mode: '0755'
+      loop:
+        - "{{ node_exporter_home }}"
+        - "{{ node_exporter_bin_dir }}"
+
+    - name: Download Node Exporter
+      get_url:
+        url: "https://github.com/prometheus/node_exporter/releases/download/v{{ node_exporter_version }}/node_exporter-{{ node_exporter_version }}.{{ node_exporter_arch }}.tar.gz"
+        dest: "/tmp/node_exporter-{{ node_exporter_version }}.{{ node_exporter_arch }}.tar.gz"
+        mode: '0644'
+      when: not node_exporter_binary.stat.exists
+
+    - name: Extract Node Exporter
+      unarchive:
+        src: "/tmp/node_exporter-{{ node_exporter_version }}.{{ node_exporter_arch }}.tar.gz"
+        dest: /tmp
+        remote_src: yes
+      when: not node_exporter_binary.stat.exists
+
+    - name: Copy Node Exporter binary
+      copy:
+        src: "/tmp/node_exporter-{{ node_exporter_version }}.{{ node_exporter_arch }}/node_exporter"
+        dest: "{{ node_exporter_bin_dir }}/node_exporter"
+        owner: "{{ node_exporter_user }}"
+        group: "{{ node_exporter_group }}"
+        mode: '0755'
+        remote_src: yes
+      when: not node_exporter_binary.stat.exists
+
+    - name: Create systemd service file
+      copy:
+        dest: /etc/systemd/system/node_exporter.service
+        mode: '0644'
+        content: |
+          [Unit]
+          Description=Prometheus Node Exporter
+          Documentation=https://prometheus.io/docs/guides/node-exporter/
+          After=network.target
+
+          [Service]
+          Type=simple
+          User={{ node_exporter_user }}
+          Group={{ node_exporter_group }}
+          ExecStart={{ node_exporter_bin_dir }}/node_exporter \
+            --web.listen-address=0.0.0.0:9100
+          Restart=always
+          RestartSec=5
+          LimitNOFILE=65536
+
+          [Install]
+          WantedBy=multi-user.target
+
+    - name: Clean up downloaded files
+      file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - "/tmp/node_exporter-{{ node_exporter_version }}.{{ node_exporter_arch }}.tar.gz"
+        - "/tmp/node_exporter-{{ node_exporter_version }}.{{ node_exporter_arch }}"
+      when: not node_exporter_binary.stat.exists
+
+    - name: Reload systemd daemon
+      systemd:
+        daemon_reload: yes
+
+    - name: Enable and start Node Exporter service
+      systemd:
+        name: node_exporter
+        enabled: yes
+        state: started
