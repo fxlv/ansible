@@ -35,11 +35,19 @@
         creates: ~/.cache/nvim.bak
       ignore_errors: true
 
-    - name: Download Neovim AppImage
+    - name: Download Neovim AppImage (ARM64)
       get_url:
         url: https://github.com/neovim/neovim/releases/download/stable/nvim-linux-arm64.appimage
         dest: ~/opt/bin/nvim
         mode: '0755'
+      when: ansible_architecture in ['aarch64', 'arm64']
+
+    - name: Download Neovim AppImage (x86_64)
+      get_url:
+        url: https://github.com/neovim/neovim/releases/download/stable/nvim-linux-x86_64.appimage
+        dest: ~/opt/bin/nvim
+        mode: '0755'
+      when: ansible_architecture in ['x86_64', 'amd64']
 
     - name: Clone LazyVim starter configuration
       git:
