@@ -1,0 +1,71 @@
+---
+- name: Install Tarsnap backup tool
+  hosts: all
+  become: true
+  vars:
+    tarsnap_key_url: "https://pkg.tarsnap.com/tarsnap-deb-packaging-key.asc"
+  
+  tasks:
+    - name: Check if running on Debian/Ubuntu
+      fail:
+        msg: "This playbook only supports Debian/Ubuntu systems"
+      when: ansible_os_family != "Debian"
+
+    - name: Check if Tarsnap is already installed
+      command: which tarsnap
+      register: tarsnap_check
+      failed_when: false
+      changed_when: false
+
+    - name: Skip installation if Tarsnap already exists
+      debug:
+        msg: "Tarsnap is already installed, skipping installation steps"
+      when: tarsnap_check.rc == 0
+
+    - name: Download Tarsnap GPG key
+      get_url:
+        url: "{{ tarsnap_key_url }}"
+        dest: "/tmp/tarsnap-key.asc"
+        mode: '0644'
+        timeout: 30
+      when: tarsnap_check.rc != 0
+
+    - name: Import Tarsnap GPG key
+      apt_key:
+        file: "/tmp/tarsnap-key.asc"
+        state: present
+      when: tarsnap_check.rc != 0
+
+    - name: Add Tarsnap repository
+      apt_repository:
+        repo: "deb http://pkg.tarsnap.com/deb/{{ ansible_distribution_release }} ./"
+        state: present
+        update_cache: false
+      when: tarsnap_check.rc != 0
+
+    - name: Update apt cache
+      apt:
+        update_cache: true
+        cache_valid_time: 3600
+      when: tarsnap_check.rc != 0
+
+    - name: Install Tarsnap
+      apt:
+        name: tarsnap
+        state: present
+      when: tarsnap_check.rc != 0
+
+    - name: Clean up temporary GPG key file
+      file:
+        path: "/tmp/tarsnap-key.asc"
+        state: absent
+      when: tarsnap_check.rc != 0
+
+    - name: Verify Tarsnap installation
+      command: tarsnap --version
+      register: tarsnap_version
+      changed_when: false
+
+    - name: Display Tarsnap version
+      debug:
+        msg: "Tarsnap installed successfully: {{ tarsnap_version.stdout }}"
