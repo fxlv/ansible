@@ -4,6 +4,22 @@
   become: true
   vars:
     tarsnap_key_url: "https://pkg.tarsnap.com/tarsnap-deb-packaging-key.asc"
+    
+    # Tarsnap backup configuration
+    tarsnap_backup_dirs:
+      - /home
+      - /etc
+    tarsnap_exclude_patterns:
+      - "*.tmp"
+      - "*.cache" 
+      - "*/.git"
+      - "*/node_modules"
+      - "*/__pycache__"
+    tarsnap_max_archives: 30
+    tarsnap_keyfile: "/root/tarsnap.key"
+    tarsnap_log_file: "/var/log/tarsnap-backup.log"
+    tarsnap_bin: "/usr/bin/tarsnap"
+    tarsnap_enable_notifications: true
   
   tasks:
     - name: Check if running on Debian/Ubuntu
@@ -69,3 +85,40 @@
     - name: Display Tarsnap version
       debug:
         msg: "Tarsnap installed successfully: {{ tarsnap_version.stdout }}"
+
+
+    - name: Deploy Tarsnap backup script
+      template:
+        src: templates/tarsnap-backup.sh.j2
+        dest: /usr/local/bin/tarsnap-backup.sh
+        owner: root
+        group: root
+        mode: '0755'
+
+    - name: Create log directory for Tarsnap
+      file:
+        path: "{{ tarsnap_log_file | dirname }}"
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+
+    - name: Set up cron job for Tarsnap backups
+      cron:
+        name: "Tarsnap automatic backup"
+        minute: "0"
+        hour: "*/4"
+        job: "/usr/local/bin/tarsnap-backup.sh"
+        user: root
+        state: present
+
+    - name: Display backup configuration
+      debug:
+        msg: |
+          Tarsnap backup script deployed to /usr/local/bin/tarsnap-backup.sh
+          Backup directories: {{ tarsnap_backup_dirs | join(', ') }}
+          Exclude patterns: {{ tarsnap_exclude_patterns | join(', ') }}
+          Max archives: {{ tarsnap_max_archives }}
+          Log file: {{ tarsnap_log_file }}
+          Cron schedule: Every 4 hours (0 */4 * * *)
+          Pushover notifications: {{ 'Enabled' if tarsnap_enable_notifications else 'Disabled' }}

@@ -1,0 +1,260 @@
+#!/bin/bash
+
+# Tarsnap Backup Script
+# This script creates encrypted backups using Tarsnap
+
+set -euo pipefail
+
+# Configuration
+TARSNAP_BIN="{{ tarsnap_bin | default('/usr/local/bin/tarsnap') }}"
+BACKUP_DIRS="{{ tarsnap_backup_dirs | join(' ') }}"
+EXCLUDE_PATTERNS="{{ tarsnap_exclude_patterns | join(',') }}"
+MAX_ARCHIVES="{{ tarsnap_max_archives | default(30) }}"
+LOG_FILE="{{ tarsnap_log_file | default('/var/log/tarsnap-backup.log') }}"
+KEYFILE="{{ tarsnap_keyfile | default('/root/tarsnap.key') }}"
+
+# Pushover notification settings
+PUSHOVER_TOKEN="{{ pushover_app_token | default('') }}"
+PUSHOVER_USER="{{ pushover_user_key | default('') }}"
+ENABLE_NOTIFICATIONS="{{ tarsnap_enable_notifications | default(true) | lower }}"
+
+# Set computer name for notifications and archive naming
+COMPUTER=$(uname -n)
+
+# Capture tarsnap output for statistics parsing
+TARSNAP_OUTPUT=$(mktemp)
+
+# Log rotation function
+rotate_log() {
+    if [[ -f "${LOG_FILE}" ]]; then
+        local log_size=$(stat -c%s "${LOG_FILE}" 2>/dev/null || stat -f%z "${LOG_FILE}" 2>/dev/null || echo 0)
+        local max_size=$((10 * 1024 * 1024))  # 10MB in bytes
+        
+        if [[ ${log_size} -ge ${max_size} ]]; then
+            # Remove oldest log if it exists
+            [[ -f "${LOG_FILE}.3.gz" ]] && rm -f "${LOG_FILE}.3.gz"
+            
+            # Rotate existing logs
+            [[ -f "${LOG_FILE}.2.gz" ]] && mv "${LOG_FILE}.2.gz" "${LOG_FILE}.3.gz"
+            [[ -f "${LOG_FILE}.1.gz" ]] && mv "${LOG_FILE}.1.gz" "${LOG_FILE}.2.gz"
+            
+            # Compress current log and move it
+            gzip -c "${LOG_FILE}" > "${LOG_FILE}.1.gz"
+            
+            # Start fresh log
+            echo "$(date '+%Y-%m-%d %H:%M:%S') - Log rotated (previous log compressed)" > "${LOG_FILE}"
+        fi
+    fi
+}
+
+# Pushover notification function
+send_notification() {
+    local message="$1"
+    local priority="${2:-0}"  # Default priority is normal (0)
+    
+    log "Notification attempt: enabled=${ENABLE_NOTIFICATIONS}, token_set=${PUSHOVER_TOKEN:+yes}, user_set=${PUSHOVER_USER:+yes}"
+    
+    if [[ "${ENABLE_NOTIFICATIONS}" != "true" ]]; then
+        log "Notifications disabled, skipping"
+        return 0
+    fi
+    
+    if [[ -z "${PUSHOVER_TOKEN}" ]]; then
+        log "WARNING: Pushover app token not set, cannot send notification"
+        return 1
+    fi
+    
+    if [[ -z "${PUSHOVER_USER}" ]]; then
+        log "WARNING: Pushover user key not set, cannot send notification"
+        return 1
+    fi
+    
+    log "Sending Pushover notification..."
+    local response=$(curl -s \
+        --form-string "token=${PUSHOVER_TOKEN}" \
+        --form-string "user=${PUSHOVER_USER}" \
+        --form-string "message=${message}" \
+        --form-string "priority=${priority}" \
+        --form-string "title=Tarsnap Backup - ${COMPUTER}" \
+        https://api.pushover.net/1/messages.json 2>&1)
+    local exit_code=$?
+    
+    if [[ ${exit_code} -eq 0 ]]; then
+        log "Pushover notification sent successfully"
+        log "Pushover response: ${response}"
+    else
+        log "WARNING: Failed to send Pushover notification (exit code: ${exit_code})"
+        log "Pushover error response: ${response}"
+    fi
+    
+    return ${exit_code}
+}
+
+# Logging function
+log() {
+    echo "$(date '+%Y-%m-%d %H:%M:%S') - $1" | tee -a "${LOG_FILE}"
+}
+
+# Error handling
+cleanup() {
+    if [[ $? -ne 0 ]]; then
+        log "ERROR: Backup failed"
+    fi
+    # Clean up temporary files
+    [[ -f "${TARSNAP_OUTPUT}" ]] && rm -f "${TARSNAP_OUTPUT}"
+}
+trap cleanup EXIT
+
+# Check prerequisites
+if [[ ! -x "${TARSNAP_BIN}" ]]; then
+    log "ERROR: Tarsnap binary not found at ${TARSNAP_BIN}"
+    exit 1
+fi
+
+if [[ ! -f "${KEYFILE}" ]]; then
+    log "ERROR: Tarsnap key file not found at ${KEYFILE}"
+    exit 1
+fi
+
+
+# Rotate log file if needed
+rotate_log
+
+# Set up archive name
+TIMESTAMP=$(date +%Y-%m-%d_%H-%M-%S)
+ARCHIVE_NAME="${COMPUTER}-${TIMESTAMP}"
+
+log "Starting backup: ${ARCHIVE_NAME}"
+
+# Build tarsnap command
+TARSNAP_CMD="${TARSNAP_BIN} --keyfile ${KEYFILE}"
+
+# Add exclude patterns
+if [[ -n "${EXCLUDE_PATTERNS}" ]]; then
+    IFS=',' read -ra EXCLUDES <<< "${EXCLUDE_PATTERNS}"
+    for pattern in "${EXCLUDES[@]}"; do
+        TARSNAP_CMD="${TARSNAP_CMD} --exclude ${pattern}"
+    done
+fi
+
+# Create backup with timing and statistics
+log "Creating archive with directories: ${BACKUP_DIRS}"
+BACKUP_START=$(date +%s)
+
+if ${TARSNAP_CMD} -c -f "${ARCHIVE_NAME}" --print-stats ${BACKUP_DIRS} > "${TARSNAP_OUTPUT}" 2>&1; then
+    BACKUP_END=$(date +%s)
+    BACKUP_DURATION=$((BACKUP_END - BACKUP_START))
+    
+    # Log the tarsnap output for debugging
+    log "Tarsnap output:"
+    while IFS= read -r line; do
+        log "  $line"
+    done < "${TARSNAP_OUTPUT}"
+    
+    # Parse statistics from tarsnap output
+    TOTAL_SIZE=""
+    COMPRESSED_SIZE=""
+    NEW_DATA=""
+    
+    # Extract statistics using grep and awk
+    if grep -q "This archive" "${TARSNAP_OUTPUT}"; then
+        # Extract "This archive" line data (total size, compressed size)
+        ARCHIVE_LINE=$(grep "This archive" "${TARSNAP_OUTPUT}")
+        if [[ -n "${ARCHIVE_LINE}" ]]; then
+            TOTAL_SIZE=$(echo "${ARCHIVE_LINE}" | awk '{print $3}')
+            COMPRESSED_SIZE=$(echo "${ARCHIVE_LINE}" | awk '{print $4}')
+        fi
+    fi
+    
+    if grep -q "New data" "${TARSNAP_OUTPUT}"; then
+        # Extract "New data" line
+        NEW_DATA_LINE=$(grep "New data" "${TARSNAP_OUTPUT}")
+        if [[ -n "${NEW_DATA_LINE}" ]]; then
+            NEW_DATA=$(echo "${NEW_DATA_LINE}" | awk '{print $3}')
+        fi
+    fi
+    
+    # Format duration as human-readable
+    DURATION_FORMATTED=""
+    if [[ ${BACKUP_DURATION} -ge 3600 ]]; then
+        HOURS=$((BACKUP_DURATION / 3600))
+        MINUTES=$(((BACKUP_DURATION % 3600) / 60))
+        SECONDS=$((BACKUP_DURATION % 60))
+        DURATION_FORMATTED="${HOURS}h ${MINUTES}m ${SECONDS}s"
+    elif [[ ${BACKUP_DURATION} -ge 60 ]]; then
+        MINUTES=$((BACKUP_DURATION / 60))
+        SECONDS=$((BACKUP_DURATION % 60))
+        DURATION_FORMATTED="${MINUTES}m ${SECONDS}s"
+    else
+        DURATION_FORMATTED="${BACKUP_DURATION}s"
+    fi
+    
+    # Format sizes for human readability
+    format_bytes() {
+        local bytes=${1:-0}
+        if [[ ${bytes} -ge 1073741824 ]]; then
+            echo "$((bytes / 1073741824)).$((bytes % 1073741824 * 10 / 1073741824))GB"
+        elif [[ ${bytes} -ge 1048576 ]]; then
+            echo "$((bytes / 1048576)).$((bytes % 1048576 * 10 / 1048576))MB"
+        elif [[ ${bytes} -ge 1024 ]]; then
+            echo "$((bytes / 1024)).$((bytes % 1024 * 10 / 1024))KB"
+        else
+            echo "${bytes}B"
+        fi
+    }
+    
+    # Format statistics for logging
+    STATS_LOG="Duration: ${DURATION_FORMATTED}"
+    if [[ -n "${TOTAL_SIZE:-}" ]]; then
+        TOTAL_FORMATTED=$(format_bytes "${TOTAL_SIZE}")
+        COMPRESSED_FORMATTED=$(format_bytes "${COMPRESSED_SIZE}")
+        STATS_LOG="${STATS_LOG}, Total: ${TOTAL_FORMATTED}, Compressed: ${COMPRESSED_FORMATTED}"
+    fi
+    if [[ -n "${NEW_DATA:-}" ]]; then
+        NEW_DATA_FORMATTED=$(format_bytes "${NEW_DATA}")
+        STATS_LOG="${STATS_LOG}, New data: ${NEW_DATA_FORMATTED}"
+    fi
+    
+    log "SUCCESS: Archive ${ARCHIVE_NAME} created successfully - ${STATS_LOG}"
+else
+    log "ERROR: Failed to create archive ${ARCHIVE_NAME}"
+    send_notification "❌ Backup FAILED for ${COMPUTER}: Failed to create archive ${ARCHIVE_NAME}" "1"
+    exit 1
+fi
+
+# Archive cleanup - keep only the most recent MAX_ARCHIVES
+log "Cleaning up old archives (keeping ${MAX_ARCHIVES} most recent)"
+ARCHIVES=$(${TARSNAP_CMD} --list-archives | grep "^${COMPUTER}-" | sort -r)
+ARCHIVE_COUNT=$(echo "${ARCHIVES}" | wc -l)
+
+if [[ ${ARCHIVE_COUNT} -gt ${MAX_ARCHIVES} ]]; then
+    OLD_ARCHIVES=$(echo "${ARCHIVES}" | tail -n +$((MAX_ARCHIVES + 1)))
+    while IFS= read -r archive; do
+        if [[ -n "${archive}" ]]; then
+            log "Deleting old archive: ${archive}"
+            if ${TARSNAP_CMD} -d -f "${archive}"; then
+                log "Deleted archive: ${archive}"
+            else
+                log "WARNING: Failed to delete archive: ${archive}"
+            fi
+        fi
+    done <<< "${OLD_ARCHIVES}"
+fi
+
+log "Backup completed successfully"
+
+# Send success notification with statistics
+NOTIFICATION_MSG="✅ Backup completed for ${COMPUTER}
+Archive: ${ARCHIVE_NAME}
+Duration: ${DURATION_FORMATTED}"
+
+if [[ -n "${TOTAL_SIZE:-}" && -n "${NEW_DATA:-}" ]]; then
+    NOTIFICATION_MSG="${NOTIFICATION_MSG}
+Total: ${TOTAL_FORMATTED} → ${COMPRESSED_FORMATTED}
+New data: ${NEW_DATA_FORMATTED}"
+fi
+
+NOTIFICATION_MSG="${NOTIFICATION_MSG}
+Keeping ${MAX_ARCHIVES} most recent archives."
+
+send_notification "${NOTIFICATION_MSG}"
