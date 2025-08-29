@@ -1,0 +1,89 @@
+---
+- name: Install Forgejo
+  hosts: all
+  become: yes
+  vars:
+    forgejo_version: "{{ forgejo_version | default('12.0.1') }}"
+    forgejo_user: "{{ forgejo_user | default('forgejo') }}"
+    forgejo_home: "{{ forgejo_home | default('/home/' + forgejo_user) }}"
+    forgejo_binary_url: "https://codeberg.org/forgejo/forgejo/releases/download/v{{ forgejo_version }}/forgejo-{{ forgejo_version }}-linux-amd64"
+
+  tasks:
+    - name: Create forgejo system user
+      user:
+        name: "{{ forgejo_user }}"
+        system: yes
+        home: "{{ forgejo_home }}"
+        shell: /bin/bash
+        create_home: yes
+        password_lock: yes
+        state: present
+
+    - name: Create forgejo directories
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: "{{ forgejo_user }}"
+        group: "{{ forgejo_user }}"
+        mode: '0755'
+      loop:
+        - "{{ forgejo_home }}/opt"
+        - "{{ forgejo_home }}/opt/bin"
+        - "{{ forgejo_home }}/data"
+        - "{{ forgejo_home }}/etc"
+
+    - name: Download Forgejo binary
+      get_url:
+        url: "{{ forgejo_binary_url }}"
+        dest: "{{ forgejo_home }}/opt/bin/forgejo"
+        owner: "{{ forgejo_user }}"
+        group: "{{ forgejo_user }}"
+        mode: '0755'
+      notify: restart forgejo
+
+    - name: Install systemd service file
+      template:
+        src: templates/forgejo.service
+        dest: /etc/systemd/system/forgejo.service
+        mode: '0644'
+      notify:
+        - reload systemd
+        - restart forgejo
+
+
+    - name: Check current SSH AllowUsers configuration
+      shell: grep "^AllowUsers" /etc/ssh/sshd_config || echo "AllowUsers not found"
+      register: current_allowusers
+      changed_when: false
+
+    - name: Add forgejo user to SSH AllowUsers if not present
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^AllowUsers'
+        line: 'AllowUsers {{ ssh_admin_user }} {{ forgejo_user }}'
+        state: present
+        backup: yes
+      when: forgejo_user not in current_allowusers.stdout
+      notify: restart ssh
+
+    - name: Enable and start Forgejo service
+      systemd:
+        name: forgejo
+        enabled: yes
+        state: started
+        daemon_reload: yes
+
+  handlers:
+    - name: reload systemd
+      systemd:
+        daemon_reload: yes
+
+    - name: restart forgejo
+      systemd:
+        name: forgejo
+        state: restarted
+
+    - name: restart ssh
+      systemd:
+        name: ssh
+        state: restarted
