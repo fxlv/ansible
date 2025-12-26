@@ -58,12 +58,6 @@
         state: present
       when: primary_ssh_key.stat.exists
 
-    - name: Set up secondary SSH key
-      authorized_key:
-        user: "{{ user }}"
-        key: "{{ lookup('file', 'secondayssh.key') }}"
-        state: present
-
     - name: Deploy sudoers configuration for Debian-like systems
       template:
         src: templates/sudoers_fx.j2
